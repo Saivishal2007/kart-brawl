@@ -1,0 +1,28 @@
+{
+  "name": "kart-brawl",
+  "version": "1.0.0",
+  "description": "KART BRAWL: Smash Karts Mega Arena - Multiplayer Server Foundation",
+  "main": "server/server.js",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "NODE_ENV=development node server/server.js"
+  },
+  "keywords": [
+    "kart",
+    "brawl",
+    "game",
+    "socket.io",
+    "threejs",
+    "multiplayer"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.22.3",
+    "socket.io": "^4.8.3",
+    "socket.io-client": "^4.8.3"
+  }
+}
