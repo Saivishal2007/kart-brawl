@@ -42,6 +42,27 @@ app.get('/health', (req, res) => {
   });
 });
 
+// Performance Profiler Metrics Endpoint
+app.get('/metrics', (req, res) => {
+  const roomsMetrics = {};
+  if (roomManager.rooms) {
+    for (const [id, room] of Object.entries(roomManager.rooms)) {
+      roomsMetrics[id] = room.getPerfMetrics ? room.getPerfMetrics() : null;
+    }
+  }
+  res.status(200).json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    uptime: Math.floor((Date.now() - startTime) / 1000),
+    connections: io.engine ? io.engine.clientsCount : 0,
+    roomsCount: Object.keys(roomsMetrics).length,
+    rooms: roomsMetrics
+  });
+});
+
+// Favicon Endpoint
+app.get('/favicon.ico', (req, res) => res.status(204).end());
+
 // Serve static client files from client directory
 app.use(express.static(path.join(__dirname, '../client')));
 
@@ -57,12 +78,12 @@ io.on('connection', (socket) => {
 
   // 1. Create Room
   socket.on('createRoom', (data = {}) => {
-    roomManager.createRoom(socket, data.displayName);
+    roomManager.createRoom(socket, data.displayName, data.characterId);
   });
 
   // 2. Join Room
   socket.on('joinRoom', (data = {}) => {
-    roomManager.joinRoom(socket, data.roomId, data.displayName);
+    roomManager.joinRoom(socket, data.roomId, data.displayName, data.characterId);
   });
 
   // 3. Leave Room

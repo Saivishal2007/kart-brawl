@@ -19,7 +19,7 @@ class RoomManager {
     return code;
   }
 
-  createRoom(socket, displayName) {
+  createRoom(socket, displayName, characterId) {
     // Leave current room if already in one
     this.leaveRoom(socket);
 
@@ -27,7 +27,7 @@ class RoomManager {
     const room = new GameRoom(roomId, this.io);
     this.rooms[roomId] = room;
 
-    const result = room.addPlayer(socket, displayName);
+    const result = room.addPlayer(socket, displayName, characterId);
     if (result.success) {
       this.playerRoomMap[socket.id] = roomId;
       socket.emit('roomCreated', {
@@ -35,12 +35,12 @@ class RoomManager {
         hostId: room.hostId,
         spawn: result.spawn
       });
-      console.log(`[RoomManager] Created Room ${roomId} by host ${socket.id}`);
+      console.log(`[RoomManager] Created Room ${roomId} by host ${socket.id} (char: ${characterId || 'racer'})`);
     }
     return room;
   }
 
-  joinRoom(socket, roomId, displayName) {
+  joinRoom(socket, roomId, displayName, characterId) {
     if (!roomId) {
       socket.emit('roomNotFound', { message: 'Room ID is required.' });
       return null;
@@ -70,7 +70,7 @@ class RoomManager {
     // Leave current room if in one
     this.leaveRoom(socket);
 
-    const result = room.addPlayer(socket, displayName);
+    const result = room.addPlayer(socket, displayName, characterId);
     if (result.success) {
       this.playerRoomMap[socket.id] = cleanRoomId;
       socket.emit('roomJoined', {
@@ -78,7 +78,7 @@ class RoomManager {
         hostId: room.hostId,
         spawn: result.spawn
       });
-      console.log(`[RoomManager] Player ${socket.id} joined Room ${cleanRoomId}`);
+      console.log(`[RoomManager] Player ${socket.id} joined Room ${cleanRoomId} (char: ${characterId || 'racer'})`);
     }
     return room;
   }

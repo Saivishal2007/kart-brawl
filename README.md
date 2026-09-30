@@ -2,6 +2,11 @@
 
 A high-octane 3D WebGL kart-brawler built with **Three.js**, **Express**, and **Socket.IO**.
 
+- **GitHub Repository**: [https://github.com/Saivishal2007/kart-brawl](https://github.com/Saivishal2007/kart-brawl)
+- **Live Public URL**: [https://d45e68b276b389.lhr.life](https://d45e68b276b389.lhr.life)
+- **Public Health Endpoint**: [https://d45e68b276b389.lhr.life/health](https://d45e68b276b389.lhr.life/health)
+- **Release Notes**: [RELEASE_NOTES.md](file:///C:/Users/msaiv/.gemini/antigravity/scratch/kart-brawl/RELEASE_NOTES.md)
+
 ---
 
 ## 🚀 Quick Start Instructions
