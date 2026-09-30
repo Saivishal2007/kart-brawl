@@ -1,0 +1,28 @@
+# ==============================================================================
+# Render Blueprint Configuration for KART BRAWL Multiplayer Server
+# ==============================================================================
+# Deploys the authoritative Node.js + Express + Socket.IO server as a Web Service.
+
+services:
+  - type: web
+    name: kart-brawl-server
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: HOST
+        value: 0.0.0.0
+      # CORS_ORIGIN: Set to your Netlify URL (e.g. https://kartbrawl.netlify.app) or *
+      - key: CORS_ORIGIN
+        sync: false
+      # Supabase Project URL (e.g. https://jhnmeistdjzvmpafreum.supabase.co)
+      - key: SUPABASE_URL
+        sync: false
+      # Supabase Browser-safe Publishable Key (sb_publishable_... or anon public key)
+      - key: SUPABASE_PUBLISHABLE_KEY
+        sync: false

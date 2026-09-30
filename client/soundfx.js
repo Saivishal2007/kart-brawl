@@ -423,26 +423,63 @@
       if (typeof Haptics !== 'undefined' && Haptics.vibrateNitro) Haptics.vibrateNitro();
     },
 
-    playPeaFire(worldPos, isPlayerControlled = false) {
+    playBulletFire(worldPos, isPlayerControlled = false) {
       if (!this.isEnabled()) return;
       const chan = this.getSpatialChannel(worldPos, isPlayerControlled);
       if (!chan) return;
       const now = this.ctx.currentTime;
 
-      // Classic arcade pew: swift pitch drop with body
+      // 1. Sharp high-frequency mechanical crack transient
+      const noiseBuf = this.createNoiseBuffer(0.04);
+      if (noiseBuf) {
+        const noise = this.ctx.createBufferSource();
+        noise.buffer = noiseBuf;
+        const bFilter = this.ctx.createBiquadFilter();
+        bFilter.type = 'bandpass';
+        bFilter.frequency.setValueAtTime(2800, now);
+        bFilter.Q.setValueAtTime(2.2, now);
+        const noiseGain = this.ctx.createGain();
+        noiseGain.gain.setValueAtTime(isPlayerControlled ? 0.32 : 0.10, now);
+        noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+        noise.connect(bFilter);
+        bFilter.connect(noiseGain);
+        noiseGain.connect(chan);
+        noise.start(now);
+        noise.stop(now + 0.04);
+      }
+
+      // 2. Punchy arcade bullet body: swift downward pitch sweep
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(750, now);
-      osc.frequency.exponentialRampToValueAtTime(160, now + 0.08);
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(880, now);
+      osc.frequency.exponentialRampToValueAtTime(140, now + 0.075);
 
-      gain.gain.setValueAtTime(isPlayerControlled ? 0.26 : 0.08, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+      gain.gain.setValueAtTime(isPlayerControlled ? 0.28 : 0.09, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.075);
 
-      osc.connect(gain); gain.connect(chan);
-      osc.start(now); osc.stop(now + 0.08);
+      osc.connect(gain);
+      gain.connect(chan);
+      osc.start(now);
+      osc.stop(now + 0.075);
 
-      if (isPlayerControlled && typeof Haptics !== 'undefined' && Haptics.vibrate) Haptics.vibrate(12);
+      // 3. Metallic brass ring resonance
+      const metalOsc = this.ctx.createOscillator();
+      const metalGain = this.ctx.createGain();
+      metalOsc.type = 'sine';
+      metalOsc.frequency.setValueAtTime(3200, now);
+      metalGain.gain.setValueAtTime(isPlayerControlled ? 0.08 : 0.02, now);
+      metalGain.gain.exponentialRampToValueAtTime(0.001, now + 0.045);
+      metalOsc.connect(metalGain);
+      metalGain.connect(chan);
+      metalOsc.start(now);
+      metalOsc.stop(now + 0.045);
+
+      if (isPlayerControlled && typeof Haptics !== 'undefined' && Haptics.vibrate) Haptics.vibrate(14);
+    },
+
+    playPeaFire(worldPos, isPlayerControlled = false) {
+      return this.playBulletFire(worldPos, isPlayerControlled);
     },
 
     playRocketFire(worldPos, isPlayerControlled = false) {

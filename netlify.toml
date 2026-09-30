@@ -1,0 +1,45 @@
+# ==============================================================================
+# Netlify Configuration for KART BRAWL Frontend
+# ==============================================================================
+
+[build]
+  publish = "client"
+
+# Production HTTP Security & Performance Headers
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# Performance caching for static scripts and audio assets
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+
+[[headers]]
+  for = "/*.mp3"
+  [headers.values]
+    Cache-Control = "public, max-age=604800, immutable"
+
+# Proxy /api requests to Render backend
+[[redirects]]
+  from = "/api/*"
+  to = "https://kart-brawl.onrender.com/api/:splat"
+  status = 200
+  force = true
+
+# Proxy /socket.io requests to Render backend
+[[redirects]]
+  from = "/socket.io/*"
+  to = "https://kart-brawl.onrender.com/socket.io/:splat"
+  status = 200
+  force = true
+
+# SPA fallback for routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

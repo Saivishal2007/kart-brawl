@@ -8,7 +8,7 @@ const SPAWN_POSITIONS = [
 ];
 
 const WEAPONS = {
-  pea:   { name: 'PEA BLASTER', dmg: 8,  speed: 52, cooldown: 0.22, ammo: Infinity, splash: 0,   knock: 3.5, size: 0.25 },
+  pea:   { name: 'BULLET BLASTER', dmg: 8,  speed: 52, cooldown: 0.22, ammo: Infinity, splash: 0,   knock: 3.5, size: 0.25 },
   rocket:{ name: 'ROCKET',      dmg: 35, speed: 38, cooldown: 0.65, ammo: 4,        splash: 7.2, knock: 16,  size: 0.50 },
   triple:{ name: 'TRIPLE SHOT', dmg: 10, speed: 46, cooldown: 0.26, ammo: 12,       splash: 0,   knock: 5.5, size: 0.28 },
   mine:  { name: 'MINE',        dmg: 40, speed: 0,  cooldown: 0.60, ammo: 3,        splash: 6.2, knock: 18,  size: 0.58 }
@@ -1277,5 +1277,7 @@ class GameRoom {
     }
   }
 }
+
+GameRoom.WEAPONS = WEAPONS;
 
 module.exports = GameRoom;

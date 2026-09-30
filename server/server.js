@@ -1,8 +1,30 @@
+const fs = require('fs');
 const express = require('express');
 const http = require('http');
 const path = require('path');
 const { Server } = require('socket.io');
 const RoomManager = require('./RoomManager');
+
+// Automatically load root .env if present
+const envFilePath = path.join(__dirname, '../.env');
+if (fs.existsSync(envFilePath)) {
+  try {
+    const raw = fs.readFileSync(envFilePath, 'utf8');
+    raw.split('\n').forEach(line => {
+      const trimmed = line.trim();
+      if (trimmed && !trimmed.startsWith('#')) {
+        const eqIdx = trimmed.indexOf('=');
+        if (eqIdx > 0) {
+          const k = trimmed.slice(0, eqIdx).trim();
+          const v = trimmed.slice(eqIdx + 1).trim().replace(/^['"]|['"]$/g, '');
+          if (!process.env[k]) process.env[k] = v;
+        }
+      }
+    });
+  } catch (e) {
+    console.warn('Could not read .env file:', e.message);
+  }
+}
 
 const app = express();
 const server = http.createServer(app);
@@ -12,11 +34,32 @@ const allowedOrigins = process.env.CORS_ORIGIN
   ? process.env.CORS_ORIGIN.split(',').map(origin => origin.trim())
   : "*";
 
+// Express CORS Middleware for REST Endpoints
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (!origin || allowedOrigins === '*' || (Array.isArray(allowedOrigins) && (allowedOrigins.includes(origin) || allowedOrigins.includes('*')))) {
+    res.setHeader('Access-Control-Allow-Origin', origin || '*');
+  } else if (Array.isArray(allowedOrigins) && origin) {
+    if (allowedOrigins.some(o => origin === o || origin.startsWith(o))) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+    }
+  }
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, apikey');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  if (req.method === 'OPTIONS') {
+    return res.status(204).end();
+  }
+  next();
+});
+
 const io = new Server(server, {
   cors: {
     origin: allowedOrigins,
-    methods: ["GET", "POST"]
-  }
+    methods: ["GET", "POST"],
+    credentials: true
+  },
+  transports: ['websocket', 'polling']
 });
 
 const PORT = process.env.PORT || 3000;
@@ -57,6 +100,17 @@ app.get('/metrics', (req, res) => {
     connections: io.engine ? io.engine.clientsCount : 0,
     roomsCount: Object.keys(roomsMetrics).length,
     rooms: roomsMetrics
+  });
+});
+
+// Public Configuration Endpoint (Supabase Browser-safe Publishable Key & URL only)
+app.get('/api/config', (req, res) => {
+  const publishableKey = process.env.SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_ANON_KEY || '';
+  res.status(200).json({
+    supabaseUrl: process.env.SUPABASE_URL || '',
+    supabasePublishableKey: publishableKey,
+    // Provide backwards compatibility for existing clients
+    supabaseAnonKey: publishableKey
   });
 });
 
@@ -119,8 +173,9 @@ io.on('connection', (socket) => {
 });
 
 // Start Server
-const runningServer = server.listen(PORT, () => {
-  console.log(`🎮 Kart Brawl Server running on http://localhost:${PORT}`);
+const HOST = process.env.HOST || '0.0.0.0';
+const runningServer = server.listen(PORT, HOST, () => {
+  console.log(`🎮 Kart Brawl Server running on port ${PORT} (bind ${HOST}, env: ${process.env.NODE_ENV || 'development'})`);
 });
 
 // Graceful Shutdown Handler

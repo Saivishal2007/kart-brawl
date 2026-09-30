@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>KART BRAWL: Momentum Arena</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏎️</text></svg>">
+<!-- Production Deployment Configuration Overrides -->
+<meta name="kb-server-url" content="https://kart-brawl.onrender.com">
+<meta name="supabase-url" content="https://jhnmeistdjzvmpafreum.supabase.co">
+<meta name="supabase-publishable-key" content="sb_publishable_BPAbRXUJxiOqL2TZRDJp8g_HRcQ78VZ">
 <style>
   /* ==========================================================================
      KART BRAWL 2.0 — DESIGN SYSTEM TOKENS & ARCHITECTURE (PHASE 6.1)
@@ -1483,8 +1487,250 @@
     .lobby-header-row > div { text-align: center !important; }
     .countdown-number { font-size: 72px; }
     .main-title { font-size: 40px; }
-    .main-subtitle { font-size: 12px; letter-spacing: 2px; }
-    .menu-btn { font-size: 15px; padding: 14px 22px; }
+  /* ==========================================================================
+     KART BRAWL Phase 7.2 — AUTHENTICATION & PILOT PASSPORT UI
+     ========================================================================== */
+  .kb-btn-auth {
+    font-family: var(--kb-font-heading);
+    font-weight: 800;
+    font-size: 11px;
+    letter-spacing: 0.8px;
+    padding: 6px 14px;
+    border-radius: var(--kb-radius-pill);
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    outline: none;
+    border: 1.5px solid transparent;
+  }
+  .kb-btn-login {
+    background: linear-gradient(135deg, rgba(0, 243, 255, 0.2), rgba(112, 0, 255, 0.3));
+    border-color: var(--kb-color-cyan);
+    color: var(--kb-color-cyan);
+    box-shadow: 0 0 12px rgba(0, 243, 255, 0.25);
+  }
+  .kb-btn-login:hover {
+    background: linear-gradient(135deg, rgba(0, 243, 255, 0.35), rgba(112, 0, 255, 0.5));
+    box-shadow: 0 0 18px rgba(0, 243, 255, 0.5);
+    transform: translateY(-1px);
+    color: #fff;
+  }
+  .kb-btn-logout {
+    background: rgba(255, 0, 85, 0.15);
+    border-color: var(--kb-color-danger);
+    color: #ff6090;
+  }
+  .kb-btn-logout:hover {
+    background: rgba(255, 0, 85, 0.3);
+    color: #fff;
+    box-shadow: 0 0 14px rgba(255, 0, 85, 0.4);
+    transform: translateY(-1px);
+  }
+
+  .kb-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    background: rgba(6, 7, 19, 0.82);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    animation: fadeIn 0.2s ease-out;
+  }
+  .kb-auth-card {
+    position: relative;
+    width: 100%;
+    max-width: 440px;
+    background: var(--kb-color-surface-elevated);
+    border: 2px solid var(--kb-color-border-glow);
+    border-radius: var(--kb-radius-lg);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(0, 243, 255, 0.2);
+    padding: 32px 28px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: slideUpPop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @keyframes slideUpPop {
+    from { opacity: 0; transform: translateY(18px) scale(0.96); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .kb-auth-close-btn {
+    position: absolute;
+    top: 16px;
+    right: 18px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    font-size: 14px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+  .kb-auth-close-btn:hover {
+    background: rgba(255, 0, 85, 0.4);
+    border-color: var(--kb-color-danger);
+    transform: rotate(90deg);
+  }
+  .kb-auth-header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .kb-auth-title {
+    font-family: var(--kb-font-display);
+    font-size: 26px;
+    letter-spacing: 1px;
+    margin: 6px 0 4px;
+    color: #ffffff;
+    text-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+  }
+  .kb-auth-subtitle {
+    font-family: var(--kb-font-heading);
+    font-size: 12px;
+    color: var(--kb-color-text-muted);
+    margin: 0;
+    line-height: 1.4;
+  }
+  .kb-auth-tabs {
+    display: flex;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.45);
+    border-radius: var(--kb-radius-pill);
+    padding: 4px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+  }
+  .kb-auth-tab {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--kb-color-text-muted);
+    font-family: var(--kb-font-heading);
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    padding: 9px 12px;
+    border-radius: var(--kb-radius-pill);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .kb-auth-tab.active {
+    background: linear-gradient(135deg, var(--kb-color-cyan), #0099ff);
+    color: #050714;
+    box-shadow: 0 0 15px rgba(0, 243, 255, 0.5);
+  }
+  .kb-auth-field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    text-align: left;
+    width: 100%;
+  }
+  .kb-auth-label {
+    font-family: var(--kb-font-heading);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: var(--kb-color-cyan);
+  }
+  .kb-auth-input {
+    width: 100%;
+    box-sizing: border-box;
+    background: rgba(8, 11, 28, 0.85);
+    border: 1.5px solid rgba(255, 255, 255, 0.18);
+    border-radius: var(--kb-radius-sm);
+    padding: 11px 14px;
+    color: #fff;
+    font-family: var(--kb-font-heading);
+    font-size: 14px;
+    font-weight: 600;
+    outline: none;
+    transition: all 0.2s;
+  }
+  .kb-auth-input:focus {
+    border-color: var(--kb-color-cyan);
+    box-shadow: 0 0 12px rgba(0, 243, 255, 0.35);
+    background: rgba(12, 16, 40, 0.95);
+  }
+  .kb-auth-hint {
+    font-size: 10px;
+    color: var(--kb-color-text-muted);
+    font-style: italic;
+  }
+  .kb-btn-auth-primary {
+    margin-top: 8px;
+    width: 100%;
+    padding: 13px 20px;
+    border: 2px solid #fff;
+    border-radius: var(--kb-radius-pill);
+    background: linear-gradient(135deg, var(--kb-color-yellow), var(--kb-color-orange));
+    color: #060713;
+    font-family: var(--kb-font-display);
+    font-size: 17px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(255, 170, 0, 0.4);
+    transition: all 0.2s;
+  }
+  .kb-btn-auth-primary:hover {
+    transform: translateY(-2px) scale(1.01);
+    box-shadow: 0 8px 25px rgba(255, 170, 0, 0.6);
+  }
+  .kb-btn-auth-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+  .kb-btn-auth-ghost {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--kb-color-text-muted);
+    font-family: var(--kb-font-heading);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 8px 16px;
+    border-radius: var(--kb-radius-pill);
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 14px;
+  }
+  .kb-btn-auth-ghost:hover {
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.5);
+  }
+  .kb-auth-banner {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 14px;
+    border-radius: var(--kb-radius-sm);
+    font-size: 12px;
+    font-family: var(--kb-font-heading);
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 12px;
+    text-align: left;
+  }
+  .kb-auth-banner.error {
+    background: rgba(255, 0, 85, 0.18);
+    border: 1.5px solid var(--kb-color-danger);
+    color: #ff6090;
+  }
+  .kb-auth-banner.success {
+    background: rgba(0, 255, 102, 0.18);
+    border: 1.5px solid var(--kb-color-success);
+    color: #00ff88;
   }
 </style>
 </head>
@@ -1533,7 +1779,7 @@
     <div id="weaponCardBox" style="background:rgba(10,15,30,0.85);border:2.5px solid #00e5ff;border-radius:14px;padding:8px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 4px 20px rgba(0,0,0,0.6);min-width:210px;">
       <div id="wCardIcon" style="font-size:28px;">🔫</div>
       <div style="flex:1;">
-        <div id="wCardName" style="font-size:14px;font-weight:900;letter-spacing:1px;color:#fff;">PEA BLASTER</div>
+        <div id="wCardName" style="font-size:14px;font-weight:900;letter-spacing:1px;color:#fff;">BULLET BLASTER</div>
         <div id="wCardAmmo" style="font-size:12px;font-weight:900;color:#00e5ff;">AMMO: ∞</div>
         <div id="wCardCdWrap" style="width:100%;height:4px;background:rgba(255,255,255,0.15);border-radius:2px;margin-top:4px;overflow:hidden;">
           <div id="wCardCdBar" style="width:100%;height:100%;background:#00e5ff;transition:width 0.05s linear;"></div>
@@ -1775,6 +2021,9 @@
       <div class="kb-server-badge" id="menuServerBadge" style="padding:4px 10px;font-size:10px;">
         <span class="kb-status-dot"></span> ONLINE
       </div>
+      <button id="menuAuthBtn" class="kb-btn-auth kb-btn-login" onclick="if(window.openAuthModal) window.openAuthModal()">
+        LOGIN / SIGN UP 🔑
+      </button>
     </div>
   </div>
 
@@ -1895,8 +2144,11 @@
       </button>
     </div>
 
-    <div id="serverStatusBadge" style="margin-top:16px;background:rgba(0,230,118,0.15);border:1.5px solid #00e676;color:#00e676;padding:6px 16px;border-radius:20px;font-size:12px;font-weight:900;">
-      🟢 MULTIPLAYER SERVER ONLINE (PORT 3000)
+    <!-- Error/Notice Banner for Online Menu -->
+    <div id="onlineMenuNotice" style="display:none;margin-top:12px;background:rgba(255,23,68,0.2);border:1.5px solid #ff1744;color:#ff1744;padding:8px 14px;border-radius:12px;font-size:13px;font-weight:900;width:100%;box-sizing:border-box;text-align:center;"></div>
+
+    <div id="serverStatusBadge" style="margin-top:16px;background:rgba(255,235,59,0.15);border:1.5px solid #ffeb3b;color:#ffeb3b;padding:6px 16px;border-radius:20px;font-size:12px;font-weight:900;text-align:center;">
+      🟡 CONNECTING TO MULTIPLAYER SERVER...
     </div>
 
     <button class="menu-btn btn-back" id="btnOnlineBack" onclick="if(window.setUIState) window.setUIState('MAIN_MENU')">← MAIN MENU</button>
@@ -2066,11 +2318,76 @@
   </div>
 </div>
 
+<!-- KART BRAWL Phase 7.2: Supabase Authentication Modal -->
+<div id="authModal" class="kb-modal-backdrop" style="display:none;" onclick="if(event.target===this) window.closeAuthModal()">
+  <div class="kb-modal-card kb-auth-card">
+    <button class="kb-auth-close-btn" onclick="window.closeAuthModal()" title="Close">✕</button>
+
+    <div class="kb-auth-header">
+      <div class="kb-badge kb-badge-arcade" style="margin-bottom:6px;">PILOT PASSPORT</div>
+      <h2 class="kb-auth-title" id="authModalTitle">LOG IN TO KART BRAWL</h2>
+      <p class="kb-auth-subtitle" id="authModalSubtitle">Save your garage loadout, level progression, and stats across devices.</p>
+    </div>
+
+    <!-- Tab Toggle -->
+    <div class="kb-auth-tabs">
+      <button class="kb-auth-tab active" id="tabBtnLogin" onclick="window.switchAuthTab('login')">LOGIN</button>
+      <button class="kb-auth-tab" id="tabBtnSignup" onclick="window.switchAuthTab('signup')">CREATE ACCOUNT</button>
+    </div>
+
+    <!-- Feedback Notice / Error Banner -->
+    <div id="authFeedback" class="kb-auth-banner" style="display:none;"></div>
+
+    <!-- Login Form -->
+    <form id="authLoginForm" onsubmit="event.preventDefault(); window.handleAuthLogin();" style="display:flex; flex-direction:column; gap:12px; width:100%;">
+      <div class="kb-auth-field">
+        <label class="kb-auth-label">EMAIL ADDRESS</label>
+        <input type="email" id="authLoginEmail" class="kb-auth-input" placeholder="pilot@kartbrawl.io" required autocomplete="email">
+      </div>
+      <div class="kb-auth-field">
+        <label class="kb-auth-label">PASSWORD</label>
+        <input type="password" id="authLoginPassword" class="kb-auth-input" placeholder="••••••••" required autocomplete="current-password">
+      </div>
+      <button type="submit" id="btnSubmitLogin" class="kb-btn-auth-primary">
+        <span>🚀 LOG IN</span>
+      </button>
+    </form>
+
+    <!-- Sign Up Form -->
+    <form id="authSignupForm" onsubmit="event.preventDefault(); window.handleAuthSignup();" style="display:none; flex-direction:column; gap:12px; width:100%;">
+      <div class="kb-auth-field">
+        <label class="kb-auth-label">PILOT DISPLAY NAME (PUBLIC)</label>
+        <input type="text" id="authSignupUsername" class="kb-auth-input" placeholder="ShadowSai" maxlength="16" required autocomplete="username">
+        <span class="kb-auth-hint">Shown in matches & leaderboards. Email is kept private.</span>
+      </div>
+      <div class="kb-auth-field">
+        <label class="kb-auth-label">EMAIL ADDRESS</label>
+        <input type="email" id="authSignupEmail" class="kb-auth-input" placeholder="pilot@kartbrawl.io" required autocomplete="email">
+      </div>
+      <div class="kb-auth-field">
+        <label class="kb-auth-label">CREATE PASSWORD</label>
+        <input type="password" id="authSignupPassword" class="kb-auth-input" placeholder="Min 6 characters" required autocomplete="new-password">
+      </div>
+      <button type="submit" id="btnSubmitSignup" class="kb-btn-auth-primary">
+        <span>⭐ CREATE ACCOUNT</span>
+      </button>
+    </form>
+
+    <!-- Guest / Continue without login option -->
+    <div class="kb-auth-footer-actions">
+      <button type="button" class="kb-btn-auth-ghost" onclick="window.closeAuthModal()">CONTINUE AS GUEST</button>
+    </div>
+  </div>
+</div>
+
+<script src="config.js"></script>
 <script src="three.min.js"></script>
 <script>if (typeof THREE === 'undefined') document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"><\/script>');</script>
 <script src="/socket.io/socket.io.js"></script>
 <script>if (typeof io === 'undefined') document.write('<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"><\/script>');</script>
 <script src="soundfx.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="auth.js"></script>
 <script>
 (function(){
 "use strict";
@@ -2101,7 +2418,7 @@ function updateStartScreenLvl(){
     if(lvlEl && typeof ProgressionSystem !== 'undefined' && ProgressionSystem.data) lvlEl.textContent = ProgressionSystem.data.level;
 
     const nameDisplay = document.getElementById('menuPlayerNameDisplay');
-    const name = localStorage.getItem('kb_player_name') || 'KartPlayer';
+    const name = (window.AuthSystem && AuthSystem.getUsername()) || localStorage.getItem('kb_player_name') || 'KartPlayer';
     if(nameDisplay) nameDisplay.textContent = name;
 
     const avatarEl = document.getElementById('menuAvatar');
@@ -2124,6 +2441,7 @@ function updateStartScreenLvl(){
 
     const charEl = document.getElementById('heroMenuCharName');
     if (charEl && charObj) charEl.textContent = charObj.name;
+
     const kartEl = document.getElementById('heroMenuKartName');
     if (kartEl && kartObj) kartEl.textContent = `${kartObj.name} CLASS (${kartObj.maxHp} HP)`;
 
@@ -2134,11 +2452,159 @@ function updateStartScreenLvl(){
 }
 
 function getPlayerName() {
+  if (window.AuthSystem && AuthSystem.isLoggedIn()) {
+    const u = AuthSystem.getUsername();
+    if (u) return u;
+  }
   const input = document.getElementById('playerNameInput');
   let val = input ? input.value.trim() : '';
-  if (!val) val = localStorage.getItem('kb_player_name') || 'KartPlayer';
+  if (!val) val = (window.AuthSystem && AuthSystem.getUsername()) || localStorage.getItem('kb_player_name') || 'KartPlayer';
   return val;
 }
+
+/* ---------------- PHASE 7.2 AUTH MODAL CONTROLLERS ---------------- */
+window.openAuthModal = function(tab = 'login') {
+  const modal = document.getElementById('authModal');
+  if (modal) {
+    modal.style.display = 'flex';
+    window.switchAuthTab(tab);
+    const feedback = document.getElementById('authFeedback');
+    if (feedback) feedback.style.display = 'none';
+  }
+};
+
+window.closeAuthModal = function() {
+  const modal = document.getElementById('authModal');
+  if (modal) modal.style.display = 'none';
+};
+
+window.switchAuthTab = function(tab) {
+  const tabLogin = document.getElementById('tabBtnLogin');
+  const tabSignup = document.getElementById('tabBtnSignup');
+  const formLogin = document.getElementById('authLoginForm');
+  const formSignup = document.getElementById('authSignupForm');
+  const title = document.getElementById('authModalTitle');
+  const feedback = document.getElementById('authFeedback');
+  if (feedback) feedback.style.display = 'none';
+
+  if (tab === 'signup') {
+    if (tabLogin) tabLogin.classList.remove('active');
+    if (tabSignup) tabSignup.classList.add('active');
+    if (formLogin) formLogin.style.display = 'none';
+    if (formSignup) formSignup.style.display = 'flex';
+    if (title) title.textContent = 'CREATE PILOT ACCOUNT';
+  } else {
+    if (tabSignup) tabSignup.classList.remove('active');
+    if (tabLogin) tabLogin.classList.add('active');
+    if (formSignup) formSignup.style.display = 'none';
+    if (formLogin) formLogin.style.display = 'flex';
+    if (title) title.textContent = 'LOG IN TO KART BRAWL';
+  }
+};
+
+window.handleAuthLogin = async function() {
+  const emailInput = document.getElementById('authLoginEmail');
+  const passInput = document.getElementById('authLoginPassword');
+  const submitBtn = document.getElementById('btnSubmitLogin');
+  const feedback = document.getElementById('authFeedback');
+
+  const email = emailInput ? emailInput.value.trim() : '';
+  const pass = passInput ? passInput.value : '';
+
+  if (!email || !pass) {
+    if (feedback) {
+      feedback.className = 'kb-auth-banner error';
+      feedback.textContent = 'Please enter both email and password.';
+      feedback.style.display = 'block';
+    }
+    return;
+  }
+
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '⏳ LOGGING IN...';
+  }
+
+  if (window.AuthSystem) {
+    const res = await window.AuthSystem.signIn(email, pass);
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<span>🚀 LOG IN</span>';
+    }
+    if (res.success) {
+      if (feedback) {
+        feedback.className = 'kb-auth-banner success';
+        feedback.textContent = '✅ Login successful! Loading profile...';
+        feedback.style.display = 'block';
+      }
+      setTimeout(() => {
+        window.closeAuthModal();
+        if (typeof window.flashCenterMsg === 'function') {
+          window.flashCenterMsg(`👋 WELCOME BACK, ${window.AuthSystem.getUsername()}!`);
+        }
+      }, 700);
+    } else {
+      if (feedback) {
+        feedback.className = 'kb-auth-banner error';
+        feedback.textContent = res.error || 'Failed to log in.';
+        feedback.style.display = 'block';
+      }
+    }
+  }
+};
+
+window.handleAuthSignup = async function() {
+  const usernameInput = document.getElementById('authSignupUsername');
+  const emailInput = document.getElementById('authSignupEmail');
+  const passInput = document.getElementById('authSignupPassword');
+  const submitBtn = document.getElementById('btnSubmitSignup');
+  const feedback = document.getElementById('authFeedback');
+
+  const username = usernameInput ? usernameInput.value.trim() : '';
+  const email = emailInput ? emailInput.value.trim() : '';
+  const pass = passInput ? passInput.value : '';
+
+  if (!username || !email || !pass) {
+    if (feedback) {
+      feedback.className = 'kb-auth-banner error';
+      feedback.textContent = 'All fields are required.';
+      feedback.style.display = 'block';
+    }
+    return;
+  }
+
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '⏳ CREATING ACCOUNT...';
+  }
+
+  if (window.AuthSystem) {
+    const res = await window.AuthSystem.signUp(username, email, pass);
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<span>⭐ CREATE ACCOUNT</span>';
+    }
+    if (res.success) {
+      if (feedback) {
+        feedback.className = 'kb-auth-banner success';
+        feedback.textContent = res.message || '✅ Account created! Welcome to Kart Brawl!';
+        feedback.style.display = 'block';
+      }
+      setTimeout(() => {
+        window.closeAuthModal();
+        if (typeof window.flashCenterMsg === 'function') {
+          window.flashCenterMsg(`🎉 ACCOUNT CREATED, ${window.AuthSystem.getUsername()}!`);
+        }
+      }, 900);
+    } else {
+      if (feedback) {
+        feedback.className = 'kb-auth-banner error';
+        feedback.textContent = res.error || 'Failed to create account.';
+        feedback.style.display = 'block';
+      }
+    }
+  }
+};
 
 function initPlayerNameInput() {
   const input = document.getElementById('playerNameInput');
@@ -2150,6 +2616,8 @@ function initPlayerNameInput() {
 function clearJoinError() {
   const err = document.getElementById('joinErrorMsg');
   if (err) { err.style.display = 'none'; err.textContent = ''; }
+  const onlineNotice = document.getElementById('onlineMenuNotice');
+  if (onlineNotice) { onlineNotice.style.display = 'none'; onlineNotice.textContent = ''; }
 }
 
 function showJoinError(msg) {
@@ -2157,6 +2625,14 @@ function showJoinError(msg) {
   if (err) {
     err.style.display = 'block';
     err.textContent = msg;
+  }
+  const onlineNotice = document.getElementById('onlineMenuNotice');
+  if (onlineNotice) {
+    onlineNotice.style.display = 'block';
+    onlineNotice.textContent = msg;
+  }
+  if (typeof showLobbyNotice === 'function') {
+    showLobbyNotice(msg, true);
   }
 }
 
@@ -2346,13 +2822,40 @@ window.confirmCharacterSelection = function() {
 };
 
 window.handleCreateRoom = function() {
+  clearJoinError();
   const name = typeof getPlayerName === 'function' ? getPlayerName() : 'KartPlayer';
   try { localStorage.setItem('kb_player_name', name); } catch(e){}
-  if (typeof socket !== 'undefined' && socket && socket.connected) {
-    const charId = (typeof CharacterRegistry !== 'undefined' && CharacterRegistry.getSelectedCharacterId) ? CharacterRegistry.getSelectedCharacterId() : 'speedster';
-    socket.emit('createRoom', { displayName: name, characterId: charId });
+
+  const charId = (typeof CharacterRegistry !== 'undefined' && CharacterRegistry.getSelectedCharacterId) 
+    ? CharacterRegistry.getSelectedCharacterId() 
+    : 'speedster';
+
+  if (typeof socket !== 'undefined' && socket) {
+    if (socket.connected) {
+      console.log('⚡ Emitting createRoom event to server for:', name, charId);
+      socket.emit('createRoom', { displayName: name, characterId: charId });
+    } else {
+      showJoinError('⏳ Connecting to multiplayer server... Creating room automatically upon connection.');
+      console.log('Socket not yet connected. Queuing createRoom on connect event...');
+
+      const onConnectCreate = () => {
+        console.log('⚡ Socket connected! Emitting queued createRoom event.');
+        clearJoinError();
+        socket.emit('createRoom', { displayName: name, characterId: charId });
+      };
+
+      socket.once('connect', onConnectCreate);
+
+      setTimeout(() => {
+        if (!socket.connected) {
+          socket.off('connect', onConnectCreate);
+          const sUrl = (window.KB_CONFIG && window.KB_CONFIG.getSocketUrl && window.KB_CONFIG.getSocketUrl()) || 'server';
+          showJoinError(`❌ Server unreachable or starting up (${sUrl}). Please retry in a few seconds.`);
+        }
+      }, 10000);
+    }
   } else {
-    if (typeof showJoinError === 'function') showJoinError('❌ Server offline. Unable to create room.');
+    showJoinError('❌ Multiplayer engine not loaded. Please refresh the page.');
   }
   if (typeof SoundFX !== 'undefined' && SoundFX.playUIClick) SoundFX.playUIClick();
 };
@@ -2554,17 +3057,45 @@ function showLobbyNotice(msg, isError = false) {
 }
 
 if (typeof io !== 'undefined') {
-  socket = io();
+  const socketTargetUrl = (window.KB_CONFIG && window.KB_CONFIG.getSocketUrl)
+    ? window.KB_CONFIG.getSocketUrl()
+    : undefined;
+
+  const socketOptions = {
+    transports: ['websocket', 'polling'],
+    reconnection: true,
+    reconnectionAttempts: Infinity,
+    reconnectionDelay: 1000,
+    reconnectionDelayMax: 5000,
+    timeout: 20000
+  };
+
+  socket = socketTargetUrl ? io(socketTargetUrl, socketOptions) : io(socketOptions);
 
   socket.on('connect', () => {
     myPlayerId = socket.id;
-    console.log('Connected to Kart Brawl server!');
+    console.log('Connected to Kart Brawl server!', socketTargetUrl || '(same origin)');
+    clearJoinError();
     const badge = document.getElementById('serverStatusBadge');
     if (badge) {
       badge.style.background = 'rgba(0,230,118,0.15)';
       badge.style.borderColor = '#00e676';
       badge.style.color = '#00e676';
-      badge.textContent = '🟢 MULTIPLAYER SERVER ONLINE (PORT 3000)';
+      const isLocalHost = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+      badge.textContent = isLocalHost 
+        ? '🟢 MULTIPLAYER SERVER ONLINE (LOCAL)' 
+        : '🟢 MULTIPLAYER SERVER ONLINE';
+    }
+  });
+
+  socket.on('connect_error', (err) => {
+    console.warn('⚠️ Server connection error:', err.message);
+    const badge = document.getElementById('serverStatusBadge');
+    if (badge) {
+      badge.style.background = 'rgba(255,23,68,0.15)';
+      badge.style.borderColor = '#ff1744';
+      badge.style.color = '#ff1744';
+      badge.textContent = '🔴 SERVER CONNECTING / OFFLINE';
     }
   });
 
@@ -4367,7 +4898,7 @@ function updateStormWallVFX(dt) {
 
 /* ---------------- WEAPON DEFINITIONS ---------------- */
 const WEAPONS = {
-  pea:   {name:'PEA BLASTER', color:0xffffff, dmg:8,  speed:52, cooldown:.22, ammo:Infinity, splash:0, knock:3.5, size:.25},
+  pea:   {name:'BULLET BLASTER', color:0xffd54f, dmg:8,  speed:52, cooldown:.22, ammo:Infinity, splash:0, knock:3.5, size:.25},
   rocket:{name:'ROCKET',      color:0xffeb3b, dmg:35, speed:38, cooldown:.65, ammo:4,        splash:7.2, knock:16, size:.50},
   triple:{name:'TRIPLE SHOT', color:0x00e5ff, dmg:10, speed:46, cooldown:.26, ammo:12,        splash:0, knock:5.5, size:.28},
   mine:  {name:'MINE',        color:0xff2a5f, dmg:40, speed:0,  cooldown:.6,  ammo:3,          splash:6.2, knock:18, size:.58},
@@ -6617,6 +7148,34 @@ function spawnNitroFlame(k) {
   });
 }
 
+function spawnMuzzleFlash(pos, dir) {
+  if (!pos || typeof spawnParticleFromPool !== 'function') return;
+  const fwdNorm = (dir || new THREE.Vector3(0, 0, 1)).clone().normalize();
+  const flashColors = [0xffffff, 0xffd54f, 0xff9100];
+  
+  for (let i = 0; i < 6; i++) {
+    const spread = new THREE.Vector3((Math.random() - 0.5) * 3, (Math.random() - 0.5) * 3, (Math.random() - 0.5) * 3);
+    const vel = fwdNorm.clone().multiplyScalar(14 + Math.random() * 8).add(spread);
+    const col = flashColors[Math.floor(Math.random() * flashColors.length)];
+    spawnParticleFromPool(pos.clone(), vel, col, 0.14 + Math.random() * 0.08, 0.7);
+  }
+  spawnParticleFromPool(pos.clone(), fwdNorm.clone().multiplyScalar(2), 0xffe082, 0.35, 0.95);
+}
+
+function spawnBulletImpactSparks(pos, normal) {
+  if (!pos || typeof spawnParticleFromPool !== 'function') return;
+  const norm = (normal || new THREE.Vector3(0, 1, 0)).clone().normalize();
+  const sparkColors = [0xffffff, 0xffe082, 0xffa000, 0xff6f00];
+  const sparkCount = 12;
+
+  for (let i = 0; i < sparkCount; i++) {
+    const spread = new THREE.Vector3((Math.random() - 0.5) * 8, Math.random() * 8 + 2, (Math.random() - 0.5) * 8);
+    const vel = norm.clone().multiplyScalar(9 + Math.random() * 10).add(spread);
+    const col = sparkColors[Math.floor(Math.random() * sparkColors.length)];
+    spawnParticleFromPool(pos.clone(), vel, col, 0.18 + Math.random() * 0.10, 1.1);
+  }
+}
+
 function spawnHitStarburst(pos, isDirect = false) {
   if (!pos || typeof activeParticles === 'undefined') return;
   const particleCount = isDirect ? 14 : 8;
@@ -6904,21 +7463,54 @@ function createMineMesh(isBomber = false) {
 function createProjectileMesh(type, def, dir) {
   const g = new THREE.Group();
   if (type === 'pea') {
-    const boltGeo = new THREE.CylinderGeometry(0.16, 0.16, 0.85, 8);
-    const boltMat = new THREE.MeshStandardMaterial({
-      color: def.color,
-      emissive: def.color,
-      emissiveIntensity: 1.3,
-      roughness: 0.2
-    });
-    const bolt = new THREE.Mesh(boltGeo, boltMat);
-    bolt.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.clone().normalize());
-    g.add(bolt);
+    const bulletGroup = new THREE.Group();
 
-    const haloGeo = new THREE.SphereGeometry(0.24, 8, 8);
-    const haloMat = new THREE.MeshBasicMaterial({color: 0xffffff, transparent: true, opacity: 0.85, blending: THREE.AdditiveBlending});
-    const halo = new THREE.Mesh(haloGeo, haloMat);
-    g.add(halo);
+    // 1. Sleek polished golden-brass cartridge body
+    const bodyGeo = new THREE.CylinderGeometry(0.12, 0.12, 0.68, 10);
+    const bodyMat = new THREE.MeshStandardMaterial({
+      color: 0xdaa520,      // Polished Golden Brass
+      metalness: 0.94,
+      roughness: 0.20,
+      emissive: 0x8b6508,
+      emissiveIntensity: 0.35
+    });
+    const body = new THREE.Mesh(bodyGeo, bodyMat);
+    bulletGroup.add(body);
+
+    // 2. Aerodynamic metallic bullet tip
+    const tipGeo = new THREE.ConeGeometry(0.12, 0.36, 10);
+    const tipMat = new THREE.MeshStandardMaterial({
+      color: 0xffe082,      // Hot incandescent copper tip
+      metalness: 0.92,
+      roughness: 0.15,
+      emissive: 0xffb300,
+      emissiveIntensity: 0.75
+    });
+    const tip = new THREE.Mesh(tipGeo, tipMat);
+    tip.position.y = 0.52;
+    bulletGroup.add(tip);
+
+    // 3. Bullet base primer ring
+    const baseGeo = new THREE.CylinderGeometry(0.13, 0.13, 0.08, 10);
+    const baseMat = new THREE.MeshStandardMaterial({ color: 0x4e342e, metalness: 0.85, roughness: 0.35 });
+    const baseMesh = new THREE.Mesh(baseGeo, baseMat);
+    baseMesh.position.y = -0.34;
+    bulletGroup.add(baseMesh);
+
+    // 4. Luminous hot tracer core
+    const tracerGeo = new THREE.CylinderGeometry(0.08, 0.02, 0.85, 8);
+    const tracerMat = new THREE.MeshBasicMaterial({
+      color: 0xffd54f,
+      transparent: true,
+      opacity: 0.85,
+      blending: THREE.AdditiveBlending
+    });
+    const tracer = new THREE.Mesh(tracerGeo, tracerMat);
+    tracer.position.y = -0.72;
+    bulletGroup.add(tracer);
+
+    bulletGroup.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.clone().normalize());
+    g.add(bulletGroup);
   } else if (type === 'rocket') {
     const missile = new THREE.Group();
     const bodyGeo = new THREE.CylinderGeometry(0.18, 0.18, 1.0, 8);
@@ -7073,7 +7665,7 @@ function fireWeapon(k){
   const spawnPos = k.pos.clone().addScaledVector(fwd, 1.6).add(new THREE.Vector3(0, 0.6, 0));
 
   // Visual Muzzle Flash
-  spawnMuzzleFlash(spawnPos, WEAPONS[k.weapon] ? WEAPONS[k.weapon].color : 0xffeb3b);
+  spawnMuzzleFlash(spawnPos, fwd);
 
   if(k.weapon === 'mine'){
     const back = fwd.clone().multiplyScalar(-1.6);
@@ -7096,7 +7688,7 @@ function fireWeapon(k){
       k.weapon = 'pea'; 
       k.ammo = Infinity; 
       k.heldPowerup = null; // Powerup consumed -> slot is now EMPTY
-      if(k.isPlayer) flashCenterMsg('💥 MINES EXHAUSTED — PEA SHOOTER READY');
+      if(k.isPlayer) flashCenterMsg('💥 MINES EXHAUSTED — BULLET BLASTER READY');
     }
     return;
   }
@@ -7114,7 +7706,11 @@ function fireWeapon(k){
     SoundFX.playTripleFire(spawnPos, k.isPlayer);
     if(k.isPlayer) triggerCamShake(0.16, 0.10);
   } else {
-    SoundFX.playPeaFire(spawnPos, k.isPlayer);
+    if (typeof SoundFX.playBulletFire === 'function') {
+      SoundFX.playBulletFire(spawnPos, k.isPlayer);
+    } else {
+      SoundFX.playPeaFire(spawnPos, k.isPlayer);
+    }
     if(k.isPlayer) triggerCamShake(0.08, 0.06);
   }
 
@@ -7142,7 +7738,7 @@ function fireWeapon(k){
       k.weapon = 'pea';
       k.ammo = Infinity;
       k.heldPowerup = null; // Powerup fully expended -> slot is now EMPTY
-      if(k.isPlayer) flashCenterMsg('💥 AMMO EXHAUSTED — PEA SHOOTER READY');
+      if(k.isPlayer) flashCenterMsg('💥 AMMO EXHAUSTED — BULLET BLASTER READY');
     }
   }
 }
@@ -7798,12 +8394,21 @@ function updateProjectiles(dt){
       if (Math.random() < 0.5) {
         spawnParticleFromPool(exPos, new THREE.Vector3((Math.random()-0.5)*2, Math.random()*2, (Math.random()-0.5)*2), 0x555555, 0.35, 0.5);
       }
-    } else if(p.type === 'pea' && Math.random() < 0.35) {
-      spawnParticleFromPool(p.pos.clone(), new THREE.Vector3((Math.random()-0.5)*1.2, (Math.random()-0.5)*1.2, (Math.random()-0.5)*1.2), 0xffeb3b, 0.12, 0.4);
+    } else if(p.type === 'pea') {
+      const backDir = p.vel.clone().normalize().multiplyScalar(-0.4);
+      spawnParticleFromPool(p.pos.clone().add(backDir), p.vel.clone().multiplyScalar(-0.06), 0xffd54f, 0.15, 0.45);
+      if (Math.random() < 0.35) {
+        spawnParticleFromPool(p.pos.clone().add(backDir), new THREE.Vector3((Math.random()-0.5)*1.5, (Math.random()-0.5)*1.5, (Math.random()-0.5)*1.5), 0xfff59d, 0.10, 0.35);
+      }
     }
 
     let hit = false;
-    if(Math.hypot(p.pos.x, p.pos.z) > PLATFORM_R+5 || p.pos.y < -8) hit = true;
+    if(Math.hypot(p.pos.x, p.pos.z) > PLATFORM_R+5 || p.pos.y < -8) {
+      hit = true;
+      if (p.type === 'pea') {
+        spawnBulletImpactSparks(p.pos, p.vel.clone().normalize().negate());
+      }
+    }
 
     if (!currentRoomId) {
       for(const k of karts){
@@ -7813,6 +8418,9 @@ function updateProjectiles(dt){
         if(k.shieldT > 0 && p.pos.distanceTo(VEC_SCRATCH_1) < 2.0){
           hit = true;
           triggerShieldEMP(k);
+          if (p.type === 'pea') {
+            spawnBulletImpactSparks(p.pos, p.vel.clone().normalize().negate());
+          }
           if (p.ownerKart && p.ownerKart.isPlayer) {
             triggerHitConfirmation(0, false);
           }
@@ -7843,6 +8451,9 @@ function applyHit(p, k){
   VEC_SCRATCH_1.subVectors(k.pos, p.pos).setY(0).normalize();
   const isDirectHit = (p.type === 'rocket');
   spawnExplosion(p.pos, WEAPONS[p.type] ? WEAPONS[p.type].color : 0xffeb3b, isDirectHit);
+  if (p.type === 'pea') {
+    spawnBulletImpactSparks(p.pos, VEC_SCRATCH_1.clone().negate());
+  }
 
   let knockMag = p.knock;
   if(p.ownerKart && p.ownerKart.classKey === 'tank') knockMag *= 2.0;
@@ -9340,9 +9951,15 @@ const EquipmentSystem = {
       if (typeof CharacterRegistry !== 'undefined' && CharacterRegistry.setSelectedCharacterId) {
         CharacterRegistry.setSelectedCharacterId(itemId);
       }
+      if (window.AuthSystem && typeof window.AuthSystem.isLoggedIn === 'function' && window.AuthSystem.isLoggedIn()) {
+        window.AuthSystem.updateProfile({ equipped_character: itemId });
+      }
     } else if (category === 'kartClass') {
       localStorage.setItem(this.KEYS.kartClass, itemId);
       selectedKartClass = itemId;
+      if (window.AuthSystem && typeof window.AuthSystem.isLoggedIn === 'function' && window.AuthSystem.isLoggedIn()) {
+        window.AuthSystem.updateProfile({ equipped_kart: itemId });
+      }
     } else if (category === 'skin') {
       localStorage.setItem(this.KEYS.skin, itemId);
     } else if (category === 'wheels') {
@@ -9783,12 +10400,8 @@ document.querySelectorAll('.kb-garage-tab-btn').forEach(tab => {
 
 const btnCreateRoom = document.getElementById('btnCreateRoom');
 if (btnCreateRoom) btnCreateRoom.addEventListener('click', () => {
-  const name = getPlayerName();
-  localStorage.setItem('kb_player_name', name);
-  if (socket && socket.connected) {
-    socket.emit('createRoom', { displayName: name, characterId: CharacterRegistry.getSelectedCharacterId() });
-  } else {
-    showJoinError('❌ Server offline. Unable to create room.');
+  if (typeof window.handleCreateRoom === 'function') {
+    window.handleCreateRoom();
   }
 });
 
@@ -9797,19 +10410,8 @@ if (btnJoinRoom) btnJoinRoom.addEventListener('click', () => setUIState(UIState.
 
 const btnJoinSubmit = document.getElementById('btnJoinSubmit');
 if (btnJoinSubmit) btnJoinSubmit.addEventListener('click', () => {
-  clearJoinError();
-  const input = document.getElementById('joinCodeInput');
-  const code = input ? input.value.trim().toUpperCase() : '';
-  if (!code || code.length !== 6) {
-    showJoinError('❌ Please enter a valid 6-character room code.');
-    return;
-  }
-  const name = getPlayerName();
-  localStorage.setItem('kb_player_name', name);
-  if (socket && socket.connected) {
-    socket.emit('joinRoom', { roomId: code, displayName: name, characterId: CharacterRegistry.getSelectedCharacterId() });
-  } else {
-    showJoinError('❌ Server offline. Unable to connect to server.');
+  if (typeof window.handleJoinSubmit === 'function') {
+    window.handleJoinSubmit();
   }
 });
 
