@@ -972,18 +972,46 @@
   }
 
   #hud{display:none;position:fixed;inset:0;z-index:20;pointer-events:none;color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.8);font-family:'Segoe UI',Roboto,sans-serif;}
-  .panel{position:absolute;padding:10px 14px;}
+  .panel{position:absolute;padding:12px 16px;background:rgba(8,12,28,0.55);backdrop-filter:blur(10px);border:1.5px solid rgba(0,243,255,0.3);border-radius:16px;box-shadow:0 6px 24px rgba(0,0,0,0.6), inset 0 1px 1px rgba(255,255,255,0.15);}
 
   #topleft{top:12px;left:12px;}
-  #hpwrap{width:250px;height:22px;background:rgba(0,0,0,.5);border:3px solid #fff;border-radius:14px;overflow:hidden;box-shadow:0 4px 15px rgba(0,0,0,.3);}
-  #hpbar{height:100%;width:100%;background:linear-gradient(90deg,#00e676,#00b0ff);transition:width .15s ease-out;}
+  #hpwrap{width:250px;height:22px;background:rgba(4,7,18,0.85);border:2px solid rgba(0,243,255,0.85);border-radius:12px;overflow:hidden;box-shadow:0 0 15px rgba(0,243,255,0.4), inset 0 2px 4px rgba(0,0,0,0.6);}
+  #hpbar{height:100%;width:100%;background:linear-gradient(90deg,#00ff66,#00e5ff);box-shadow:0 0 12px rgba(0,255,102,0.7);transition:width .15s ease-out;}
   
   /* Momentum Meter HUD */
-  #momwrap{width:250px;height:14px;background:rgba(0,0,0,.6);border:2px solid rgba(255,255,255,.8);border-radius:10px;overflow:hidden;margin-top:6px;box-shadow:0 2px 10px rgba(0,0,0,.4);}
-  #mombar{height:100%;width:0%;background:linear-gradient(90deg,#00e5ff,#ffd600);transition:width .1s linear;}
-  #momText{font-size:12px;font-weight:900;letter-spacing:1px;margin-top:3px;color:#00e5ff;}
-  #superBadge{display:none;background:linear-gradient(90deg,#ff4081,#ff9100);color:#fff;font-size:12px;font-weight:900;padding:3px 10px;border-radius:12px;margin-top:4px;border:1.5px solid #fff;animation:pulse 0.6s infinite alternate;box-shadow:0 0 15px rgba(255,64,129,.8);}
+  #momwrap{width:250px;height:14px;background:rgba(4,7,18,0.85);border:1.5px solid rgba(255,230,0,0.75);border-radius:8px;overflow:hidden;margin-top:6px;box-shadow:0 0 10px rgba(255,230,0,0.3);}
+  #mombar{height:100%;width:0%;background:linear-gradient(90deg,#00f3ff,#ffe600,#ff0055);box-shadow:0 0 10px rgba(255,230,0,0.6);transition:width .1s linear;}
+  #momText{font-size:12px;font-weight:900;letter-spacing:1px;margin-top:3px;color:#00e5ff;text-shadow:0 0 8px rgba(0,229,255,0.6);}
+  #superBadge{display:none;background:linear-gradient(90deg,#ff0055,#ff6a00,#ffe600);color:#fff;font-size:12px;font-weight:900;padding:4px 12px;border-radius:12px;margin-top:4px;border:1.5px solid #fff;animation:pulse 0.6s infinite alternate;box-shadow:0 0 20px rgba(255,0,85,0.9);}
   @keyframes pulse{from{transform:scale(1)}to{transform:scale(1.05)}}
+
+  /* Bot Count Selector Buttons */
+  .bot-count-btn{
+    background:rgba(14,20,42,0.85);
+    border:1.5px solid rgba(0,243,255,0.3);
+    color:#b0c4de;
+    font-family:var(--kb-font-heading);
+    font-weight:800;
+    font-size:13px;
+    padding:8px 14px;
+    border-radius:10px;
+    cursor:pointer;
+    transition:all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    letter-spacing:0.5px;
+  }
+  .bot-count-btn:hover{
+    border-color:#00f3ff;
+    color:#fff;
+    transform:translateY(-2px);
+    box-shadow:0 4px 14px rgba(0,243,255,0.4);
+  }
+  .bot-count-btn.active{
+    background:linear-gradient(135deg, rgba(0,243,255,0.4), rgba(112,0,255,0.55));
+    border-color:#00f3ff;
+    color:#fff;
+    box-shadow:0 0 18px rgba(0,243,255,0.7);
+    transform:scale(1.05);
+  }
 
   #weaponRow{margin-top:8px;font-size:15px;font-weight:900;letter-spacing:.6px;display:flex;align-items:center;background:rgba(0,0,0,.45);padding:5px 12px;border-radius:10px;border:1.5px solid rgba(255,255,255,.25);}
   #weaponIcon{display:inline-block;width:16px;height:16px;border-radius:4px;margin-right:8px;box-shadow:0 0 10px currentColor;}
@@ -1753,6 +1781,10 @@
   <div class="panel" id="topright">
     <div id="timer">3:00</div>
     <div id="stormlabel">Arena: 72m</div>
+    <div id="mpMatchStatusPanel" style="display:none;margin-top:8px;background:rgba(10,15,30,0.88);border:1.5px solid #00e5ff;border-radius:12px;padding:8px 12px;box-shadow:0 4px 15px rgba(0,0,0,0.6);text-align:right;min-width:170px;">
+      <div style="font-size:11px;font-weight:900;letter-spacing:1px;color:#00e5ff;">ONLINE MATCH · ROOM: <span id="mpRoomCodeDisplay" style="color:#ffeb3b;font-size:13px;letter-spacing:2px;">------</span></div>
+      <div id="mpPlayerListDisplay" style="font-size:11px;font-weight:700;color:#fff;margin-top:4px;display:flex;flex-direction:column;gap:3px;"></div>
+    </div>
   </div>
 
   <div class="panel" id="topcenter">
@@ -2166,11 +2198,14 @@
       <div id="createRoomCodeDisplay" style="font-size:42px;font-weight:900;letter-spacing:6px;color:#ffeb3b;">------</div>
     </div>
 
-    <div style="display:flex;gap:12px;width:100%;justify-content:center;">
-      <button class="menu-btn btn-secondary" id="btnCopyCode" style="font-size:14px;padding:12px 20px;" onclick="if(window.copyRoomCode && window.currentRoomId) copyRoomCode(currentRoomId, 'copyBtnText')">
+    <div style="display:flex;gap:10px;width:100%;justify-content:center;flex-wrap:wrap;">
+      <button class="menu-btn btn-secondary" id="btnCopyCode" style="font-size:13px;padding:12px 18px;" onclick="if(window.copyRoomCode && window.currentRoomId) copyRoomCode(window.currentRoomId, 'copyBtnText', false)">
         <span class="btn-icon">📋</span> <span id="copyBtnText">COPY CODE</span>
       </button>
-      <button class="menu-btn btn-primary" id="btnEnterLobby" style="font-size:14px;padding:12px 20px;" onclick="if(window.setUIState) window.setUIState('MULTIPLAYER_LOBBY')">
+      <button class="menu-btn btn-secondary" id="btnCopyInviteLink" style="font-size:13px;padding:12px 18px;background:rgba(0,229,255,0.2);border-color:#00e5ff;color:#00e5ff;" onclick="if(window.copyRoomCode && window.currentRoomId) copyRoomCode(window.currentRoomId, 'copyLinkBtnText', true)">
+        <span class="btn-icon">🔗</span> <span id="copyLinkBtnText">SHARE LINK</span>
+      </button>
+      <button class="menu-btn btn-primary" id="btnEnterLobby" style="font-size:13px;padding:12px 20px;" onclick="if(window.setUIState) window.setUIState('MULTIPLAYER_LOBBY')">
         ENTER LOBBY 🚀
       </button>
     </div>
@@ -2207,12 +2242,17 @@
         <div style="font-size:12px;font-weight:900;color:#00e5ff;letter-spacing:1.5px;text-transform:uppercase;">KART BRAWL MULTIPLAYER</div>
         <div style="font-size:26px;font-weight:900;color:#ffeb3b;letter-spacing:1px;margin-top:-2px;">MATCH LOBBY</div>
       </div>
-      <div class="lobby-code-badge-wrap">
+      <div class="lobby-code-badge-wrap" style="display:flex;flex-direction:column;align-items:center;">
         <div style="font-size:10px;font-weight:900;color:#00e5ff;letter-spacing:1px;">ROOM CODE</div>
         <div id="lobbyRoomCode" style="font-size:28px;font-weight:900;color:#ffeb3b;letter-spacing:4px;line-height:1;">------</div>
-        <button class="menu-btn btn-secondary" id="btnLobbyCopyCode" style="font-size:11px;padding:4px 12px;margin-top:4px;" onclick="if(window.copyRoomCode && window.currentRoomId) copyRoomCode(currentRoomId, 'lobbyCopyBtnText')">
-          <span id="lobbyCopyBtnText">📋 COPY CODE</span>
-        </button>
+        <div style="display:flex;gap:6px;margin-top:6px;">
+          <button class="menu-btn btn-secondary" id="btnLobbyCopyCode" style="font-size:11px;padding:4px 10px;" onclick="if(window.copyRoomCode && window.currentRoomId) copyRoomCode(window.currentRoomId, 'lobbyCopyBtnText', false)">
+            <span id="lobbyCopyBtnText">📋 CODE</span>
+          </button>
+          <button class="menu-btn btn-secondary" id="btnLobbyCopyLink" style="font-size:11px;padding:4px 10px;background:rgba(0,229,255,0.2);border-color:#00e5ff;color:#00e5ff;" onclick="if(window.copyRoomCode && window.currentRoomId) copyRoomCode(window.currentRoomId, 'lobbyCopyLinkText', true)">
+            <span id="lobbyCopyLinkText">🔗 LINK</span>
+          </button>
+        </div>
       </div>
     </div>
 
@@ -2262,6 +2302,29 @@
   <div class="menu-card" style="max-width:860px;width:95%;">
     <h2>🏎️ CHOOSE YOUR KART CLASS & ABILITY</h2>
     <div class="kart-grid" id="kartGrid"></div>
+
+    <!-- AI Bot Opponent Selection Bar -->
+    <div class="solo-bot-selector-box" style="margin: 14px 0 16px 0; padding: 14px 18px; background: rgba(14, 20, 42, 0.85); border: 1.5px solid rgba(0, 243, 255, 0.4); border-radius: 14px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <div style="font-size:13px; font-weight:900; color:#00f3ff; letter-spacing:1px; text-transform:uppercase;">
+          🤖 AI Opponents in Arena:
+        </div>
+        <div id="soloBotCountBadge" style="font-size:13px; font-weight:900; color:#ffe600; background:rgba(255,230,0,0.15); border:1px solid #ffe600; padding:3px 12px; border-radius:20px;">
+          5 BOTS ACTIVE
+        </div>
+      </div>
+      <div style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap;" id="soloBotCountButtons">
+        <button type="button" class="bot-count-btn" data-count="0" onclick="window.selectBotCount(0)">0 (SOLO PRACTICE)</button>
+        <button type="button" class="bot-count-btn" data-count="1" onclick="window.selectBotCount(1)">1 BOT</button>
+        <button type="button" class="bot-count-btn" data-count="2" onclick="window.selectBotCount(2)">2 BOTS</button>
+        <button type="button" class="bot-count-btn" data-count="3" onclick="window.selectBotCount(3)">3 BOTS</button>
+        <button type="button" class="bot-count-btn" data-count="4" onclick="window.selectBotCount(4)">4 BOTS</button>
+        <button type="button" class="bot-count-btn active" data-count="5" onclick="window.selectBotCount(5)">5 BOTS</button>
+        <button type="button" class="bot-count-btn" data-count="6" onclick="window.selectBotCount(6)">6 BOTS</button>
+        <button type="button" class="bot-count-btn" data-count="7" onclick="window.selectBotCount(7)">7 (MAX)</button>
+      </div>
+    </div>
+
     <div style="display:flex;gap:14px;align-items:center;margin-top:10px;">
       <button class="menu-btn btn-back" id="btnSoloBack" style="margin-top:0;" onclick="if(window.setUIState) window.setUIState('MAIN_MENU')">← BACK</button>
       <button id="startSoloBtn" class="menu-btn btn-primary" onclick="if(window.initSoloGame) window.initSoloGame()">START ENGINE 🚀</button>
@@ -2636,25 +2699,56 @@ function showJoinError(msg) {
   }
 }
 
-function copyRoomCode(code, btnId) {
+function copyRoomCode(code, btnId, isInviteLink = false) {
   if (!code) return;
+  const textToCopy = isInviteLink
+    ? `${window.location.origin}${window.location.pathname}?room=${code}`
+    : code;
   if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(code).then(() => {
+    navigator.clipboard.writeText(textToCopy).then(() => {
       const btn = document.getElementById(btnId);
       if (btn) {
         const orig = btn.innerHTML;
-        btn.innerHTML = '✓ COPIED!';
+        btn.innerHTML = isInviteLink ? '✓ LINK COPIED!' : '✓ COPIED!';
         setTimeout(() => { btn.innerHTML = orig; }, 2000);
       }
+    }).catch(() => {
+      prompt(isInviteLink ? 'Copy Invite Link:' : 'Copy Room Code:', textToCopy);
     });
+  } else {
+    prompt(isInviteLink ? 'Copy Invite Link:' : 'Copy Room Code:', textToCopy);
   }
 }
+
+let selectedSoloBotCount = 5;
+try {
+  const saved = localStorage.getItem('kb_solo_bot_count');
+  if (saved !== null) selectedSoloBotCount = Math.max(0, Math.min(7, parseInt(saved, 10) || 0));
+} catch(e) {}
+
+function selectBotCount(count) {
+  selectedSoloBotCount = Math.max(0, Math.min(7, count));
+  try { localStorage.setItem('kb_solo_bot_count', selectedSoloBotCount); } catch(e){}
+  const badge = document.getElementById('soloBotCountBadge');
+  if (badge) {
+    badge.textContent = selectedSoloBotCount === 0 ? '0 BOTS (SOLO PRACTICE)' : `${selectedSoloBotCount} BOTS ACTIVE`;
+  }
+  document.querySelectorAll('.bot-count-btn').forEach(btn => {
+    const c = parseInt(btn.getAttribute('data-count'), 10);
+    btn.classList.toggle('active', c === selectedSoloBotCount);
+  });
+  if (typeof SoundFX !== 'undefined' && SoundFX.playUIClick) SoundFX.playUIClick();
+}
+window.selectBotCount = selectBotCount;
+window.selectedSoloBotCount = selectedSoloBotCount;
 
 function setUIState(state) {
   if (typeof state === 'string' && typeof UIState !== 'undefined' && UIState[state]) {
     state = UIState[state];
   }
   currentUIState = state;
+  window.currentUIState = state;
+  window.getUIState = () => currentUIState;
 
   const mainMenu = document.getElementById('mainMenu');
   const onlineView = document.getElementById('onlineMenuView');
@@ -3041,6 +3135,8 @@ let isRoomHost = false;
 let isMyPlayerReady = false;
 let isReadyRequestInFlight = false;
 let isStartRequestInFlight = false;
+let isMultiplayerActive = false;
+let isSpawnInitialized = false;
 const remoteKarts = {};
 
 function showLobbyNotice(msg, isError = false) {
@@ -3071,6 +3167,7 @@ if (typeof io !== 'undefined') {
   };
 
   socket = socketTargetUrl ? io(socketTargetUrl, socketOptions) : io(socketOptions);
+  window.socket = socket;
 
   socket.on('connect', () => {
     myPlayerId = socket.id;
@@ -3085,6 +3182,25 @@ if (typeof io !== 'undefined') {
       badge.textContent = isLocalHost 
         ? '🟢 MULTIPLAYER SERVER ONLINE (LOCAL)' 
         : '🟢 MULTIPLAYER SERVER ONLINE';
+    }
+
+    // Auto-join from URL parameter ?room=CODE
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const autoRoom = urlParams.get('room');
+      if (autoRoom && autoRoom.trim().length === 6 && !currentRoomId) {
+        const code = autoRoom.trim().toUpperCase();
+        console.log('🔗 Auto-joining room from URL invite:', code);
+        const input = document.getElementById('joinCodeInput');
+        if (input) input.value = code;
+        setTimeout(() => {
+          if (typeof window.handleJoinSubmit === 'function') {
+            window.handleJoinSubmit();
+          }
+        }, 350);
+      }
+    } catch(e) {
+      console.warn('Error checking URL auto-join params:', e);
     }
   });
 
@@ -3118,6 +3234,7 @@ if (typeof io !== 'undefined') {
   // --- Room System Event Handlers (Step 2.4 Ready System & Host Controls) ---
   socket.on('roomCreated', (data) => {
     currentRoomId = data.roomId;
+    window.currentRoomId = data.roomId;
     isRoomHost = true;
     isMyPlayerReady = false;
     isReadyRequestInFlight = false;
@@ -3142,6 +3259,7 @@ if (typeof io !== 'undefined') {
 
   socket.on('roomJoined', (data) => {
     currentRoomId = data.roomId;
+    window.currentRoomId = data.roomId;
     isRoomHost = data.hostId === myPlayerId;
     isMyPlayerReady = false;
     isReadyRequestInFlight = false;
@@ -3164,6 +3282,7 @@ if (typeof io !== 'undefined') {
 
   socket.on('roomState', (data) => {
     currentRoomId = data.roomId;
+    window.currentRoomId = data.roomId;
     isRoomHost = data.hostId === myPlayerId;
     isReadyRequestInFlight = false;
     isStartRequestInFlight = false;
@@ -3310,7 +3429,9 @@ if (typeof io !== 'undefined') {
       if (typeof setUIState === 'function') setUIState(UIState.COUNTDOWN);
     } else if (data.status === 'PLAYING') {
       initMultiplayerGame(data.matchTime);
+      if (typeof flashCenterMsg === 'function') flashCenterMsg('🏁 MATCH STARTED! BRAWL!');
     } else if (data.status === 'WAITING') {
+      isMultiplayerActive = false;
       if (typeof setUIState === 'function' && (currentUIState === UIState.COUNTDOWN || currentUIState === UIState.GAME)) {
         setUIState(UIState.MULTIPLAYER_LOBBY);
         showLobbyNotice('⚠️ Match reset to lobby state.');
@@ -3329,10 +3450,20 @@ if (typeof io !== 'undefined') {
 
   socket.on('playerLeft', (data) => {
     showLobbyNotice('🚪 A player left the room.');
+    if (data && data.id && remoteKarts[data.id]) {
+      const rk = remoteKarts[data.id];
+      if (rk.mesh) scene.remove(rk.mesh);
+      const idx = karts.indexOf(rk);
+      if (idx !== -1) karts.splice(idx, 1);
+      delete remoteKarts[data.id];
+      console.log(`🧹 Cleaned up disconnected player kart: ${data.id}`);
+    }
   });
 
 function cleanMatchStateForLobby() {
   lastSentInputStr = '';
+  isMultiplayerActive = false;
+  isSpawnInitialized = false;
   for (let k in keys) keys[k] = false;
   for (let t in touch) touch[t] = false;
   spacePressed = false;
@@ -3356,6 +3487,9 @@ function clearRoomClientState() {
   cleanMatchStateForLobby();
 
   currentRoomId = null;
+  window.currentRoomId = null;
+  isMultiplayerActive = false;
+  isSpawnInitialized = false;
   isRoomHost = false;
   isMyPlayerReady = false;
   isReadyRequestInFlight = false;
@@ -3430,6 +3564,7 @@ function clearRoomClientState() {
 
   socket.on('gameState', (data) => {
     if (!data || !Array.isArray(data.players)) return;
+    if (currentRoomId && data.roomId && data.roomId !== currentRoomId) return;
 
     if (data.matchTime !== undefined) {
       roundElapsed = ROUND_TIME - data.matchTime;
@@ -3449,23 +3584,46 @@ function clearRoomClientState() {
       if (p.id === myPlayerId) {
         // Authoritative reconciliation for local player with smooth error blending
         if (typeof player !== 'undefined' && player) {
+          if (!isSpawnInitialized) {
+            isSpawnInitialized = true;
+            player.pos.set(p.x, p.y || 0, p.z);
+            player.yaw = p.yaw;
+            player.speed = p.speed;
+            player.updateMeshTransform();
+            if (typeof camera !== 'undefined' && camera) {
+              VEC_SCRATCH_1.set(Math.sin(player.yaw), 0, Math.cos(player.yaw));
+              VEC_SCRATCH_2.copy(player.pos).addScaledVector(VEC_SCRATCH_1, -9.0);
+              VEC_SCRATCH_2.y += 5.2;
+              camera.position.copy(VEC_SCRATCH_2);
+              VEC_SCRATCH_3.copy(player.pos);
+              VEC_SCRATCH_3.y += 1.2;
+              if (typeof camTarget !== 'undefined' && camTarget) {
+                camTarget.copy(VEC_SCRATCH_3);
+              }
+              camera.lookAt(camTarget || VEC_SCRATCH_3);
+            }
+          }
+
           const dx = p.x - player.pos.x;
           const dz = p.z - player.pos.z;
           const distSq = dx * dx + dz * dz;
 
-          if (distSq > 4.0) {
-            // Hard snap on major discrepancies (respawns, huge knockback > 2 meters)
+          let diffYaw = p.yaw - player.yaw;
+          while (diffYaw < -Math.PI) diffYaw += Math.PI * 2;
+          while (diffYaw > Math.PI) diffYaw -= Math.PI * 2;
+
+          if (distSq > 4.0 || Math.abs(diffYaw) > 1.2) {
+            // Hard snap on major discrepancies (respawns, huge knockback > 2 meters, or reversed yaw)
             player.pos.x = p.x;
             player.pos.z = p.z;
             player.yaw = p.yaw;
             player.speed = p.speed;
-          } else if (distSq > 0.0025) {
-            // Smooth blend towards authoritative server position - eliminates micro-stutter / rubberbanding!
-            player.pos.x += dx * 0.35;
-            player.pos.z += dz * 0.35;
-            let diffYaw = p.yaw - player.yaw;
-            while (diffYaw < -Math.PI) diffYaw += Math.PI * 2;
-            while (diffYaw > Math.PI) diffYaw -= Math.PI * 2;
+          } else {
+            // Smooth blend towards authoritative server position & yaw
+            if (distSq > 0.0025) {
+              player.pos.x += dx * 0.35;
+              player.pos.z += dz * 0.35;
+            }
             player.yaw += diffYaw * 0.35;
             player.speed += (p.speed - player.speed) * 0.35;
           }
@@ -3487,6 +3645,9 @@ function clearRoomClientState() {
           player.heldPowerup = p.heldPowerup || null;
           if (p.nitroActive) player.nitroT = 0.5;
           player.updateMeshTransform();
+          if (!player.nameplateSprite && typeof player.setNameplate === 'function') {
+            player.setNameplate('[YOU]', true);
+          }
         }
       } else {
         if (!remoteKarts[p.id]) {
@@ -3497,6 +3658,8 @@ function clearRoomClientState() {
           remoteKart.isRemote = true;
           remoteKart.targetPos = new THREE.Vector3(p.x, p.y || 0, p.z);
           remoteKart.targetYaw = p.yaw;
+          remoteKart.yaw = p.yaw;
+          remoteKart.pos.set(p.x, p.y || 0, p.z);
           remoteKart.nitroActive = p.nitroActive;
           remoteKart.hp = p.hp;
           remoteKart.maxHp = p.maxHp;
@@ -3506,9 +3669,13 @@ function clearRoomClientState() {
           remoteKart.weapon = p.weapon || 'pea';
           remoteKart.ammo = p.ammo;
           remoteKart.heldPowerup = p.heldPowerup || null;
+          if (typeof remoteKart.setNameplate === 'function') {
+            remoteKart.setNameplate(`[${name}]`, false);
+          }
+          remoteKart.updateMeshTransform();
           remoteKarts[p.id] = remoteKart;
           karts.push(remoteKart);
-          console.log(`Spawned Remote Player Kart: ${p.id}`);
+          console.log(`Spawned Remote Player Kart: ${p.id} (${name})`);
         } else {
           // Update target position and combat properties for interpolation
           const rk = remoteKarts[p.id];
@@ -3524,6 +3691,12 @@ function clearRoomClientState() {
           rk.weapon = p.weapon || 'pea';
           rk.ammo = p.ammo;
           rk.heldPowerup = p.heldPowerup || null;
+          if (p.displayName && rk.name !== p.displayName) {
+            rk.name = p.displayName;
+            if (typeof rk.setNameplate === 'function') {
+              rk.setNameplate(`[${p.displayName}]`, false);
+            }
+          }
         }
       }
     });
@@ -3581,6 +3754,12 @@ function clearRoomClientState() {
       if (typeof showDeathScoreboard === 'function') {
         showDeathScoreboard(data.killerName || 'The Void');
       }
+    } else {
+      const rk = remoteKarts[data.targetId];
+      if (rk) {
+        rk.alive = false;
+        if (rk.mesh) rk.mesh.visible = false;
+      }
     }
   });
 
@@ -3590,9 +3769,24 @@ function clearRoomClientState() {
       if (deathScreen) deathScreen.style.display = 'none';
       if (player) {
         player.pos.set(data.x, 0, data.z);
+        if (data.yaw !== undefined) player.yaw = data.yaw;
         player.hp = data.hp || 100;
         player.alive = true;
         player.updateMeshTransform();
+      }
+    } else {
+      const rk = remoteKarts[data.id];
+      if (rk) {
+        rk.pos.set(data.x, 0, data.z);
+        if (rk.targetPos) rk.targetPos.set(data.x, 0, data.z);
+        if (data.yaw !== undefined) {
+          rk.yaw = data.yaw;
+          rk.targetYaw = data.yaw;
+        }
+        rk.hp = data.hp || 100;
+        rk.alive = true;
+        if (rk.mesh) rk.mesh.visible = true;
+        rk.updateMeshTransform();
       }
     }
   });
@@ -3665,31 +3859,6 @@ function clearRoomClientState() {
     }
   });
 
-  socket.on('matchCountdown', (data) => {
-    const numEl = document.getElementById('countdownNumber');
-    if (numEl) {
-      numEl.textContent = data.count > 0 ? data.count : 'GO!';
-    }
-    if (typeof setUIState === 'function' && currentUIState !== UIState.COUNTDOWN && currentUIState !== UIState.GAME) {
-      setUIState(UIState.COUNTDOWN);
-    }
-    if (typeof flashCenterMsg === 'function') {
-      flashCenterMsg(`MATCH STARTING IN ${data.count}...`);
-    }
-  });
-
-  socket.on('matchStateChanged', (data) => {
-    console.log('Match State Changed:', data);
-    if (data.status === 'COUNTDOWN') {
-      const numEl = document.getElementById('countdownNumber');
-      if (numEl) numEl.textContent = data.countdown || 3;
-      if (typeof setUIState === 'function') setUIState(UIState.COUNTDOWN);
-    } else if (data.status === 'PLAYING') {
-      if (typeof setUIState === 'function') setUIState(UIState.GAME);
-      if (typeof flashCenterMsg === 'function') flashCenterMsg('🏁 MATCH STARTED! BRAWL!');
-    }
-  });
-
   socket.on('matchEnded', (data) => {
     console.log('Match Ended:', data);
     if (typeof showMultiplayerEndScreen === 'function') {
@@ -3727,19 +3896,22 @@ function clearRoomClientState() {
 }
 
 let lastSentInputStr = '';
+let lastInputSentTime = 0;
 function sendPlayerInput() {
   if (currentUIState !== UIState.GAME || !socket || !socket.connected) return;
   const inp = {
-    forward: !!(keys['KeyW'] || keys['ArrowUp'] || touch.fwd),
-    backward: !!(keys['KeyS'] || keys['ArrowDown'] || touch.back),
-    left: !!(keys['KeyA'] || keys['ArrowLeft'] || touch.left),
-    right: !!(keys['KeyD'] || keys['ArrowRight'] || touch.right),
-    jump: !!(keys['Space'] || spacePressed),
+    forward: !!(keys['KeyW'] || keys['w'] || keys['W'] || keys['ArrowUp'] || touch.fwd),
+    backward: !!(keys['KeyS'] || keys['s'] || keys['S'] || keys['ArrowDown'] || touch.back),
+    left: !!(keys['KeyA'] || keys['a'] || keys['A'] || keys['ArrowLeft'] || touch.left),
+    right: !!(keys['KeyD'] || keys['d'] || keys['D'] || keys['ArrowRight'] || touch.right),
+    jump: !!(keys['Space'] || keys[' '] || spacePressed),
     nitro: !!(keys['ShiftLeft'] || keys['ShiftRight'] || touch.boost)
   };
   const str = JSON.stringify(inp);
-  if (str !== lastSentInputStr) {
+  const now = performance.now();
+  if (str !== lastSentInputStr || now - lastInputSentTime > 150) {
     lastSentInputStr = str;
+    lastInputSentTime = now;
     socket.emit('playerInput', inp);
   }
 }
@@ -4022,25 +4194,48 @@ function createArenaCombatFloorTexture(){
   const cv = document.createElement('canvas'); cv.width = cv.height = 2048;
   const ctx = cv.getContext('2d');
 
-  // Dark Tactical Composite Asphalt Base
-  ctx.fillStyle = '#101522';
+  // Deep High-Tech Midnight Arena Base
+  ctx.fillStyle = '#060914';
   ctx.fillRect(0, 0, 2048, 2048);
 
-  // Subtle Asphalt Grain Noise
-  const imgData = ctx.getImageData(0, 0, 2048, 2048);
-  const d = imgData.data;
-  for(let i=0; i<d.length; i+=4){
-    const grain = (Math.random() - 0.5) * 14;
-    d[i] = Math.min(255, Math.max(0, d[i] + grain));
-    d[i+1] = Math.min(255, Math.max(0, d[i+1] + grain));
-    d[i+2] = Math.min(255, Math.max(0, d[i+2] + grain + 2));
+  // Carbon-Fiber Micro-Grid Matrix
+  ctx.fillStyle = '#0c1122';
+  for(let y = 0; y < 2048; y += 16) {
+    for(let x = 0; x < 2048; x += 16) {
+      if ((x / 16 + y / 16) % 2 === 0) {
+        ctx.fillRect(x, y, 16, 16);
+      }
+    }
   }
-  ctx.putImageData(imgData, 0, 0);
 
-  // Modular Carbon-Plating Seam Grid (128px tiles)
+  // Sci-Fi Tech Hex Grid Overlay
+  const hexSize = 64;
+  ctx.strokeStyle = 'rgba(0, 243, 255, 0.08)';
+  ctx.lineWidth = 1.5;
+  function drawHexCell(cx, cy, s) {
+    ctx.beginPath();
+    for (let i = 0; i < 6; i++) {
+      const a = (i * Math.PI) / 3;
+      const hx = cx + s * Math.cos(a);
+      const hy = cy + s * Math.sin(a);
+      if (i === 0) ctx.moveTo(hx, hy);
+      else ctx.lineTo(hx, hy);
+    }
+    ctx.closePath();
+    ctx.stroke();
+  }
+  for (let y = 0; y < 2048 + hexSize; y += hexSize * 1.5) {
+    const isOdd = Math.floor(y / (hexSize * 1.5)) % 2 === 1;
+    const xOffset = isOdd ? hexSize * Math.sqrt(3) / 2 : 0;
+    for (let x = -hexSize; x < 2048 + hexSize; x += hexSize * Math.sqrt(3)) {
+      drawHexCell(x + xOffset, y, hexSize - 4);
+    }
+  }
+
+  // Major Combat Grid Lines (128px tiles)
   const tileSize = 128;
-  ctx.strokeStyle = '#182136';
-  ctx.lineWidth = 3;
+  ctx.strokeStyle = 'rgba(24, 34, 62, 0.85)';
+  ctx.lineWidth = 2.5;
   for(let x=0; x<=2048; x+=tileSize){
     ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 2048); ctx.stroke();
   }
@@ -4048,84 +4243,113 @@ function createArenaCombatFloorTexture(){
     ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(2048, y); ctx.stroke();
   }
 
-  // Steel Corner Rivet Hardware
-  ctx.fillStyle = '#26344f';
-  for(let x=0; x<=2048; x+=tileSize){
-    for(let y=0; y<=2048; y+=tileSize){
-      ctx.fillRect(x-3, y-3, 6, 6);
-    }
-  }
-
   const center = 1024;
 
-  // Outer Playable Fixed Perimeter Indicator Ring (R=72m -> ~775px in 95m radius texture)
-  ctx.strokeStyle = 'rgba(255, 0, 85, 0.55)';
-  ctx.lineWidth = 14;
+  // Outer Fixed Forcefield Danger Perimeter Ring (R=72m -> ~775px in 95m radius texture)
+  ctx.strokeStyle = 'rgba(255, 0, 85, 0.85)';
+  ctx.lineWidth = 16;
   ctx.beginPath();
   ctx.arc(center, center, 775, 0, Math.PI * 2);
   ctx.stroke();
 
-  // Mid Combat Ring (R=48m -> ~515px)
-  ctx.strokeStyle = 'rgba(0, 243, 255, 0.35)';
-  ctx.lineWidth = 8;
-  ctx.beginPath();
-  ctx.arc(center, center, 515, 0, Math.PI * 2);
-  ctx.stroke();
-
-  // Inner Hot Zone Ring (R=25m -> ~270px)
-  ctx.strokeStyle = 'rgba(255, 234, 0, 0.45)';
-  ctx.lineWidth = 10;
-  ctx.beginPath();
-  ctx.arc(center, center, 270, 0, Math.PI * 2);
-  ctx.stroke();
-
-  // Center Epicenter Bullseye (R=10m -> ~108px)
-  ctx.fillStyle = 'rgba(0, 243, 255, 0.08)';
-  ctx.beginPath();
-  ctx.arc(center, center, 108, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.strokeStyle = '#00f3ff';
+  // Outer Hazard Warning Ring at 792px
+  ctx.strokeStyle = 'rgba(255, 230, 0, 0.55)';
   ctx.lineWidth = 6;
   ctx.beginPath();
-  ctx.arc(center, center, 108, 0, Math.PI * 2);
+  ctx.arc(center, center, 792, 0, Math.PI * 2);
   ctx.stroke();
 
-  // Crosshair Lines
-  ctx.strokeStyle = 'rgba(0, 243, 255, 0.25)';
-  ctx.lineWidth = 4;
+  // High-Speed Drift Zone Ring (R=50m -> ~540px)
+  ctx.strokeStyle = 'rgba(0, 243, 255, 0.75)';
+  ctx.lineWidth = 10;
   ctx.beginPath();
-  ctx.moveTo(center - 160, center); ctx.lineTo(center + 160, center);
-  ctx.moveTo(center, center - 160); ctx.lineTo(center, center + 160);
+  ctx.arc(center, center, 540, 0, Math.PI * 2);
   ctx.stroke();
 
-  // High-Visibility Directional Chevrons Leading toward Center
-  ctx.fillStyle = 'rgba(255, 234, 0, 0.35)';
+  // Concentric Inner Drift Assist Ring (R=48m -> ~518px)
+  ctx.strokeStyle = 'rgba(0, 243, 255, 0.3)';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.arc(center, center, 518, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // Mid Combat Ring (R=30m -> ~324px)
+  ctx.strokeStyle = 'rgba(255, 230, 0, 0.65)';
+  ctx.lineWidth = 8;
+  ctx.beginPath();
+  ctx.arc(center, center, 324, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // Inner Hot Zone Ring (R=16m -> ~172px)
+  ctx.strokeStyle = 'rgba(255, 0, 85, 0.55)';
+  ctx.lineWidth = 6;
+  ctx.beginPath();
+  ctx.arc(center, center, 172, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // Central Holographic Insignia / Apex Arena Starburst
+  ctx.fillStyle = 'rgba(0, 243, 255, 0.12)';
+  ctx.beginPath();
+  ctx.arc(center, center, 110, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = '#00f3ff';
+  ctx.lineWidth = 5;
+  ctx.beginPath();
+  ctx.arc(center, center, 110, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // 8-Pointed Star Battle Crest in Center
+  ctx.strokeStyle = '#ffe600';
+  ctx.lineWidth = 4;
+  for (let i = 0; i < 8; i++) {
+    const a1 = (i / 8) * Math.PI * 2;
+    const a2 = ((i + 0.5) / 8) * Math.PI * 2;
+    const r1 = 96, r2 = 42;
+    if (i === 0) ctx.beginPath();
+    ctx.lineTo(center + Math.cos(a1) * r1, center + Math.sin(a1) * r1);
+    ctx.lineTo(center + Math.cos(a2) * r2, center + Math.sin(a2) * r2);
+  }
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(255, 230, 0, 0.25)';
+  ctx.fill();
+  ctx.stroke();
+
+  // Radial Crosshair Lines with Tech Ticks
+  ctx.strokeStyle = 'rgba(0, 243, 255, 0.4)';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(center - 240, center); ctx.lineTo(center + 240, center);
+  ctx.moveTo(center, center - 240); ctx.lineTo(center, center + 240);
+  ctx.stroke();
+
+  // Dynamic Runway Chevrons in 4 Cardinal Directions
   const dirs = [0, Math.PI/2, Math.PI, Math.PI * 3/2];
   dirs.forEach(angle => {
     ctx.save();
     ctx.translate(center, center);
     ctx.rotate(angle);
-    for (let r = 360; r <= 680; r += 80) {
+    ctx.fillStyle = 'rgba(0, 243, 255, 0.55)';
+    for (let r = 380; r <= 720; r += 70) {
       ctx.beginPath();
-      ctx.moveTo(0, r - 20);
-      ctx.lineTo(26, r + 15);
-      ctx.lineTo(14, r + 15);
-      ctx.lineTo(0, r - 5);
-      ctx.lineTo(-14, r + 15);
-      ctx.lineTo(-26, r + 15);
+      ctx.moveTo(0, r - 24);
+      ctx.lineTo(30, r + 16);
+      ctx.lineTo(16, r + 16);
+      ctx.lineTo(0, r - 4);
+      ctx.lineTo(-16, r + 16);
+      ctx.lineTo(-30, r + 16);
       ctx.closePath();
       ctx.fill();
     }
     ctx.restore();
   });
 
-  // Sector Quadrant Stencil Labels
-  ctx.font = 'bold 36px monospace';
-  ctx.fillStyle = 'rgba(0, 243, 255, 0.4)';
-  ctx.fillText('SECTOR 01 // NORTH', center - 180, center - 320);
-  ctx.fillText('SECTOR 02 // EAST', center + 320, center + 10);
-  ctx.fillText('SECTOR 03 // SOUTH', center - 180, center + 340);
-  ctx.fillText('SECTOR 04 // WEST', center - 620, center + 10);
+  // Futuristic Sector Stencils with High Contrast Typography
+  ctx.font = '900 32px monospace';
+  ctx.fillStyle = 'rgba(0, 243, 255, 0.75)';
+  ctx.fillText('SECTOR 01 // NORTH', center - 180, center - 360);
+  ctx.fillText('SECTOR 02 // EAST', center + 360, center + 10);
+  ctx.fillText('SECTOR 03 // SOUTH', center - 180, center + 390);
+  ctx.fillText('SECTOR 04 // WEST', center - 680, center + 10);
 
   const tex = new THREE.CanvasTexture(cv);
   return tex;
@@ -4780,27 +5004,37 @@ const stormRing = new THREE.Mesh(
 stormRing.rotation.x = Math.PI / 2; stormRing.position.y = 0.15;
 scene.add(stormRing);
 
-// 12 Perimeter Forcefield Emitter Nodes (Stationed flush at 72m)
+// 16 Perimeter Cyber Pylons with Vertical Neon Energy Beams (Flush at 72m)
 const emitterNodes = [];
 {
-  const emNodeGeo = new THREE.CylinderGeometry(0.35, 0.45, 0.6, 12);
-  const emNodeMat = new THREE.MeshStandardMaterial({ color: 0x1e2638, roughness: 0.4, metalness: 0.85 });
-  const emCapGeo = new THREE.SphereGeometry(0.22, 8, 8);
+  const emNodeGeo = new THREE.CylinderGeometry(0.4, 0.55, 0.8, 12);
+  const emNodeMat = new THREE.MeshStandardMaterial({ color: 0x141a29, roughness: 0.35, metalness: 0.9 });
+  const emCapGeo = new THREE.SphereGeometry(0.26, 10, 10);
   const emCapMat = new THREE.MeshBasicMaterial({ color: 0x00f3ff });
+  const emBeamGeo = new THREE.CylinderGeometry(0.08, 0.14, 14, 8, 1, true);
+  const emBeamMat = new THREE.MeshBasicMaterial({
+    color: 0x00f3ff,
+    transparent: true,
+    opacity: 0.35,
+    blending: THREE.AdditiveBlending,
+    side: THREE.DoubleSide
+  });
 
-  for (let i = 0; i < 12; i++) {
-    const ang = (i / 12) * Math.PI * 2;
+  for (let i = 0; i < 16; i++) {
+    const ang = (i / 16) * Math.PI * 2;
     const nx = Math.cos(ang) * ARENA_RADIUS;
     const nz = Math.sin(ang) * ARENA_RADIUS;
     const nodeGroup = new THREE.Group();
     const base = new THREE.Mesh(emNodeGeo, emNodeMat);
-    base.position.y = 0.3;
+    base.position.y = 0.4;
     const cap = new THREE.Mesh(emCapGeo, emCapMat);
-    cap.position.y = 0.6;
-    nodeGroup.add(base); nodeGroup.add(cap);
+    cap.position.y = 0.85;
+    const beam = new THREE.Mesh(emBeamGeo, emBeamMat);
+    beam.position.y = 7.0;
+    nodeGroup.add(base); nodeGroup.add(cap); nodeGroup.add(beam);
     nodeGroup.position.set(nx, 0, nz);
     scene.add(nodeGroup);
-    emitterNodes.push({ group: nodeGroup, capMat: emCapMat });
+    emitterNodes.push({ group: nodeGroup, capMat: emCapMat, beamMat: emBeamMat });
   }
 }
 
@@ -5303,7 +5537,30 @@ const CharacterModelFactory = {
   }
 };
 
-/* ---------------- KART FACTORY (PHASE 6.11 OVERHAUL) ---------------- */
+/* ---------------- KART FACTORY & NEON GRAPHICS (PHASE 6.11 OVERHAUL) ---------------- */
+let underglowTextureCache = {};
+function getUnderglowTexture(hexColor) {
+  let hexStr = '#00f3ff';
+  if (typeof hexColor === 'number') {
+    hexStr = '#' + hexColor.toString(16).padStart(6, '0');
+  } else if (typeof hexColor === 'string') {
+    hexStr = hexColor;
+  }
+  if (underglowTextureCache[hexStr]) return underglowTextureCache[hexStr];
+  const cv = document.createElement('canvas'); cv.width = 256; cv.height = 256;
+  const ctx = cv.getContext('2d');
+  const grad = ctx.createRadialGradient(128, 128, 12, 128, 128, 124);
+  grad.addColorStop(0, hexStr);
+  grad.addColorStop(0.35, hexStr);
+  grad.addColorStop(0.7, 'rgba(0, 0, 0, 0.35)');
+  grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 256, 256);
+  const tex = new THREE.CanvasTexture(cv);
+  underglowTextureCache[hexStr] = tex;
+  return tex;
+}
+
 function makeKartMesh(colorHex, isGhost=false, characterId='racer', classKey='tank'){
   const g = new THREE.Group();
   g.name = `kart_${classKey}_${characterId}`;
@@ -5363,7 +5620,22 @@ function makeKartMesh(colorHex, isGhost=false, characterId='racer', classKey='ta
     opacity: isGhostKart ? 0.75 : 1.0
   });
 
-  // 1. Lower Chassis Floorplate & Nerf Bars
+  // 1. Dynamic Neon Underglow Ground Projector
+  const underglowPlane = new THREE.Mesh(
+    new THREE.PlaneGeometry(3.0, 4.2),
+    new THREE.MeshBasicMaterial({
+      map: getUnderglowTexture(effectiveColor),
+      transparent: true,
+      opacity: 0.85,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    })
+  );
+  underglowPlane.rotation.x = -Math.PI / 2;
+  underglowPlane.position.y = 0.05;
+  g.add(underglowPlane);
+
+  // 2. Lower Chassis Floorplate & Nerf Bars
   const floor = new THREE.Mesh(new THREE.BoxGeometry(1.68, 0.10, 2.75), chassisMat);
   floor.position.y = 0.28;
   floor.castShadow = !isGhostKart;
@@ -5379,7 +5651,7 @@ function makeKartMesh(colorHex, isGhost=false, characterId='racer', classKey='ta
   nerfR.position.set(0.84, 0.36, 0.05);
   g.add(nerfL); g.add(nerfR);
 
-  // 2. Sculpted Aerodynamic Body Shell
+  // 3. Sculpted Aerodynamic Body Shell
   const hood = new THREE.Mesh(new THREE.BoxGeometry(1.35, 0.34, 1.25), bodyMat);
   hood.position.set(0, 0.48, 0.72);
   hood.castShadow = !isGhostKart;
@@ -5404,7 +5676,7 @@ function makeKartMesh(colorHex, isGhost=false, characterId='racer', classKey='ta
   rearDeck.castShadow = !isGhostKart;
   g.add(rearDeck);
 
-  // 3. Cockpit Tub, Bucket Seat & Dashboard
+  // 4. Cockpit Tub, Bucket Seat & Dashboard
   const seatBase = new THREE.Mesh(new THREE.BoxGeometry(0.72, 0.12, 0.65), interiorMat);
   seatBase.position.set(0, 0.38, -0.15);
   g.add(seatBase);
@@ -5446,12 +5718,12 @@ function makeKartMesh(colorHex, isGhost=false, characterId='racer', classKey='ta
   steerHub.position.set(0, 0.72, 0.19);
   g.add(steerHub);
 
-  // 4. Seat 3D Character Avatar inside Driver Cockpit
+  // 5. Seat 3D Character Avatar inside Driver Cockpit
   const driverAvatar = CharacterModelFactory.createAvatar(characterId, { scale: 0.94, isDriving: true });
   driverAvatar.position.set(0, 0.44, -0.18);
   g.add(driverAvatar);
 
-  // 5. Front Combat Bash Bumper & Combat Cannon
+  // 6. Front Combat Bash Bumper & Combat Cannon
   const bumper = new THREE.Mesh(new THREE.BoxGeometry(1.68, 0.18, 0.28), chassisMat);
   bumper.position.set(0, 0.34, 1.42);
   bumper.castShadow = !isGhostKart;
@@ -5465,18 +5737,34 @@ function makeKartMesh(colorHex, isGhost=false, characterId='racer', classKey='ta
   cannonR.position.set(0.24, 0.58, 1.45);
   g.add(cannonL); g.add(cannonR);
 
-  // 6. Headlights & Taillights
+  // 7. Headlights, Volumetric Projector Beams & Taillights
   const headL = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.10, 0.06), lightGlowMat);
   headL.position.set(-0.52, 0.46, 1.34);
   const headR = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.10, 0.06), lightGlowMat);
   headR.position.set(0.52, 0.46, 1.34);
   g.add(headL); g.add(headR);
 
+  // Volumetric Headlight Beams
+  const beamMat = new THREE.MeshBasicMaterial({
+    color: 0x00f3ff,
+    transparent: true,
+    opacity: 0.16,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+    side: THREE.DoubleSide
+  });
+  [-0.52, 0.52].forEach(hx => {
+    const beamMesh = new THREE.Mesh(new THREE.ConeGeometry(0.48, 3.5, 16, 1, true), beamMat);
+    beamMesh.rotation.x = -Math.PI / 2;
+    beamMesh.position.set(hx, 0.46, 3.1);
+    g.add(beamMesh);
+  });
+
   const tailBar = new THREE.Mesh(new THREE.BoxGeometry(1.22, 0.08, 0.06), brakeLightMat);
   tailBar.position.set(0, 0.56, -1.37);
   g.add(tailBar);
 
-  // 7. Twin Rear Exhaust Pipes
+  // 8. Twin Rear Exhaust Pipes & Dual Boost Thruster Jets
   const exhL = new THREE.Mesh(new THREE.CylinderGeometry(0.10, 0.12, 0.42, 12), chromeMat);
   exhL.rotation.x = Math.PI / 2;
   exhL.position.set(-0.36, 0.38, -1.48);
@@ -5485,7 +5773,22 @@ function makeKartMesh(colorHex, isGhost=false, characterId='racer', classKey='ta
   exhR.position.set(0.36, 0.38, -1.48);
   g.add(exhL); g.add(exhR);
 
-  // 8. Wheels & Metallic Rims
+  const thrusterMat = new THREE.MeshBasicMaterial({
+    color: 0x00e5ff,
+    transparent: true,
+    opacity: 0.75,
+    blending: THREE.AdditiveBlending
+  });
+  const thrusters = [];
+  [-0.36, 0.36].forEach(ex => {
+    const thruster = new THREE.Mesh(new THREE.ConeGeometry(0.13, 0.55, 12), thrusterMat);
+    thruster.rotation.x = Math.PI / 2;
+    thruster.position.set(ex, 0.38, -1.72);
+    g.add(thruster);
+    thrusters.push(thruster);
+  });
+
+  // 9. Wheels, Metallic Rims & Glowing Neon Rim Strips
   const wheelMat = new THREE.MeshStandardMaterial({
     color: 0x111116,
     roughness: 0.85,
@@ -5527,12 +5830,20 @@ function makeKartMesh(colorHex, isGhost=false, characterId='racer', classKey='ta
     hubMesh.rotation.z = Math.PI / 2;
     hubMesh.position.set(wp.x, wp.y, wp.z);
 
+    // Glowing Neon Rim Strip
+    const rimGlowGeo = new THREE.TorusGeometry(0.35, 0.032, 8, 18);
+    const rimGlowMat = new THREE.MeshBasicMaterial({ color: effectiveColor });
+    const rimGlowMesh = new THREE.Mesh(rimGlowGeo, rimGlowMat);
+    rimGlowMesh.position.set(wp.x > 0 ? wp.x + 0.02 : wp.x - 0.02, wp.y, wp.z);
+    rimGlowMesh.rotation.y = Math.PI / 2;
+
     g.add(wheelMesh);
     g.add(rimMesh);
     g.add(hubMesh);
+    g.add(rimGlowMesh);
   });
 
-  // 9. Class-Specific Distinctive Geometric Accents
+  // 10. Class-Specific Distinctive Geometric Accents
   if (classKey === 'flash') {
     const wingPylonL = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.42, 0.18), chromeMat);
     wingPylonL.position.set(-0.48, 0.92, -1.02);
@@ -5580,7 +5891,7 @@ function makeKartMesh(colorHex, isGhost=false, characterId='racer', classKey='ta
     g.add(bigExh);
   }
 
-  g.userData = { kartMesh: true, classKey, characterId, driverAvatar };
+  g.userData = { kartMesh: true, classKey, characterId, driverAvatar, underglow: underglowPlane, thrusters };
   return g;
 }
 
@@ -5998,6 +6309,62 @@ class Kart {
     this.mesh.rotation.x = pitchTilt;
     this.mesh.rotation.y = this.yaw;
     this.mesh.rotation.z = rollTilt;
+
+    if (this.nameplateSprite) {
+      this.nameplateSprite.visible = this.alive && (this.mesh.visible !== false);
+    }
+  }
+
+  setNameplate(text, isSelf = false) {
+    if (this.nameplateSprite) {
+      this.mesh.remove(this.nameplateSprite);
+      if (this.nameplateSprite.material) {
+        if (this.nameplateSprite.material.map) this.nameplateSprite.material.map.dispose();
+        this.nameplateSprite.material.dispose();
+      }
+      this.nameplateSprite = null;
+    }
+    if (!text) return;
+
+    const cv = document.createElement('canvas');
+    cv.width = 256;
+    cv.height = 64;
+    const ctx = cv.getContext('2d');
+
+    // High-visibility rounded nameplate pill
+    ctx.fillStyle = isSelf ? 'rgba(0, 229, 255, 0.92)' : 'rgba(15, 23, 42, 0.90)';
+    ctx.strokeStyle = isSelf ? '#ffffff' : '#00e5ff';
+    ctx.lineWidth = 4;
+    const r = 16, x = 6, y = 8, w = 244, h = 48;
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = isSelf ? '#0c101d' : '#f8fafc';
+    ctx.font = '900 22px Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(text, 128, 32);
+
+    const tex = new THREE.CanvasTexture(cv);
+    tex.minFilter = THREE.LinearFilter;
+    const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false, depthWrite: false });
+    const spr = new THREE.Sprite(mat);
+    spr.scale.set(3.6, 0.9, 1.0);
+    spr.position.set(0, 2.65, 0);
+    spr.renderOrder = 999;
+    this.nameplateSprite = spr;
+    this.mesh.add(spr);
   }
 
   updateAbilities(dt){
@@ -6785,6 +7152,15 @@ const mines = [];
 const pickups = [];
 const particles = [];
 
+window.player = player;
+window.karts = karts;
+window.remoteKarts = remoteKarts;
+window.projectiles = projectiles;
+window.getPlayer = () => (typeof player !== 'undefined' ? player : null);
+window.getKarts = () => (typeof karts !== 'undefined' ? karts : []);
+window.getRemoteKarts = () => (typeof remoteKarts !== 'undefined' ? remoteKarts : {});
+window.getProjectiles = () => (typeof projectiles !== 'undefined' ? projectiles : []);
+
 let cachedPickupTex = null;
 function getPickupDecalTexture(){
   if(!cachedPickupTex){
@@ -7413,6 +7789,7 @@ function pushKillFeed(text){
 
 /* ---------------- INPUT HANDLING ---------------- */
 const keys = {};
+window.keys = keys;
 let spacePressed = false;
 
 function createMineMesh(isBomber = false) {
@@ -7569,6 +7946,14 @@ function performAction(k){
 }
 
 window.addEventListener('keydown', e => { 
+  const activeTag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
+  if (activeTag === 'input' || activeTag === 'textarea') {
+    return;
+  }
+
+  keys[e.code] = true; 
+  if (e.key) keys[e.key] = true;
+
   if (e.code === 'Escape') {
     if (currentUIState === UIState.MULTIPLAYER_LOBBY || currentUIState === UIState.COUNTDOWN) {
       // Do not leave room on Escape key in lobby; user must use Leave Room button
@@ -7611,12 +7996,12 @@ window.addEventListener('keydown', e => {
   if(e.code === 'BracketRight' || e.code === 'ArrowRight'){
     if(player && !player.alive) SpectatorDirector.cycleTarget(1);
   }
-  keys[e.code] = true; 
 });
 
 window.addEventListener('keyup', e => { 
   if(e.code === 'Space') spacePressed = false;
   keys[e.code] = false; 
+  if (e.key) keys[e.key] = false;
 });
 
 window.addEventListener('mousedown', e => {
@@ -8115,13 +8500,22 @@ function integrateKart(k, dt, isPlayerControlled){
 
   if (k.isRemote) {
     if (k.targetPos) {
-      k.pos.lerp(k.targetPos, Math.min(1.0, dt * 18.0));
+      const dSq = k.pos.distanceToSquared(k.targetPos);
+      if (dSq > 36.0) {
+        k.pos.copy(k.targetPos);
+      } else {
+        k.pos.lerp(k.targetPos, Math.min(1.0, dt * 18.0));
+      }
     }
     if (k.targetYaw !== undefined) {
       let diff = k.targetYaw - k.yaw;
       while (diff < -Math.PI) diff += Math.PI * 2;
       while (diff > Math.PI) diff -= Math.PI * 2;
-      k.yaw += diff * Math.min(1.0, dt * 18.0);
+      if (Math.abs(diff) > 2.0) {
+        k.yaw = k.targetYaw;
+      } else {
+        k.yaw += diff * Math.min(1.0, dt * 18.0);
+      }
     }
     k.updateMeshTransform();
     return;
@@ -8139,8 +8533,8 @@ function integrateKart(k, dt, isPlayerControlled){
     }
   }
 
-  const fwdInput = isPlayerControlled ? ((keys['KeyW']||keys['ArrowUp']||touch.fwd) ? 1 : ((keys['KeyS']||keys['ArrowDown']||touch.back) ? -1 : 0)) : 1;
-  const turnInput = isPlayerControlled ? ((keys['KeyA']||keys['ArrowLeft']||touch.left) ? 1 : ((keys['KeyD']||keys['ArrowRight']||touch.right) ? -1 : 0)) : 0;
+  const fwdInput = isPlayerControlled ? ((keys['KeyW']||keys['w']||keys['W']||keys['ArrowUp']||touch.fwd) ? 1 : ((keys['KeyS']||keys['s']||keys['S']||keys['ArrowDown']||touch.back) ? -1 : 0)) : 1;
+  const turnInput = isPlayerControlled ? ((keys['KeyA']||keys['a']||keys['A']||keys['ArrowLeft']||touch.left) ? -1 : ((keys['KeyD']||keys['d']||keys['D']||keys['ArrowRight']||touch.right) ? 1 : 0)) : 0;
   const boosting = isPlayerControlled ? (keys['ShiftLeft']||keys['ShiftRight']||touch.boost) : false;
   const spaceHeld = isPlayerControlled ? (keys['Space'] || touch.boost) : false;
 
@@ -8219,9 +8613,16 @@ function integrateKart(k, dt, isPlayerControlled){
   }
 
   const accel = 26 * k.classData.accelMult;
-  if(fwdInput !== 0) k.speed += fwdInput*accel*dt;
-  else k.speed *= (1 - Math.min(1, dt*2.5));
-  k.speed = Math.max(-9.5 * k.classData.topSpeedMult, Math.min(maxSpeed, k.speed));
+  const brakeDecel = 60.0;
+  if(fwdInput > 0) {
+    if(k.speed < 0) k.speed = Math.min(0, k.speed + brakeDecel * dt);
+    else k.speed = Math.min(maxSpeed, k.speed + accel * dt);
+  } else if(fwdInput < 0) {
+    if(k.speed > 0) k.speed = Math.max(0, k.speed - brakeDecel * dt);
+    else k.speed = Math.max(-9.5 * k.classData.topSpeedMult, k.speed - accel * dt);
+  } else {
+    k.speed *= (1 - Math.min(1, dt * 2.5));
+  }
 
   if(Math.abs(k.speed) > 0.2 && !k.isDrifting){
     k.yaw += turnInput * dt * 2.6 * Math.min(1, Math.abs(k.speed)/6+0.3);
@@ -8716,6 +9117,15 @@ function drawMinimap(){
     ctx.beginPath(); ctx.arc(px, py, 3, 0, Math.PI*2); ctx.fill();
   });
 
+  // Radar Sweep Scan Line
+  const sweepAngle = (performance.now() * 0.0022) % (Math.PI * 2);
+  ctx.beginPath();
+  ctx.moveTo(cx, cy);
+  ctx.lineTo(cx + Math.cos(sweepAngle) * r, cy + Math.sin(sweepAngle) * r);
+  ctx.strokeStyle = 'rgba(0, 243, 255, 0.4)';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
   // Karts
   karts.forEach(k => {
     if(!k.alive) return;
@@ -8724,15 +9134,21 @@ function drawMinimap(){
     if(k.isPlayer){
       ctx.save();
       ctx.translate(px, py);
-      ctx.rotate(k.yaw);
-      ctx.fillStyle = '#00e676';
+      ctx.rotate(Math.atan2(Math.cos(k.yaw), Math.sin(k.yaw)) + Math.PI / 2);
+      ctx.fillStyle = '#00ff66';
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1;
       ctx.beginPath();
-      ctx.moveTo(0, -6); ctx.lineTo(4, 5); ctx.lineTo(-4, 5);
-      ctx.closePath(); ctx.fill();
+      ctx.moveTo(0, -7); ctx.lineTo(4.5, 5); ctx.lineTo(-4.5, 5);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
       ctx.restore();
     } else {
-      ctx.fillStyle = '#ff1744';
-      ctx.beginPath(); ctx.arc(px, py, 3.5, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = '#ff0055';
+      ctx.strokeStyle = '#ffe600';
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.arc(px, py, 3.5, 0, Math.PI*2); ctx.fill(); ctx.stroke();
     }
   });
 
@@ -8848,7 +9264,7 @@ function updateHUD(dt){
     const sorted = karts.slice().sort((a,b) => b.kills - a.kills);
     const placeIdx = sorted.findIndex(k => k.isPlayer);
     const ord = placeIdx === 0 ? '1st' : (placeIdx === 1 ? '2nd' : (placeIdx === 2 ? '3rd' : `${placeIdx+1}th`));
-    const rankTxt = `🏆 ${ord} / ${karts.length} · ⚔️ ${player.kills} KILLS`;
+    const rankTxt = karts.length > 1 ? `🏆 ${ord} / ${karts.length} · ⚔️ ${player.kills} KILLS` : `🏆 SOLO PRACTICE · ⚔️ ${player.kills} KILLS`;
     if(rankTxt !== lastRankText){
       lastRankText = rankTxt;
       domRankEl.textContent = rankTxt;
@@ -9023,6 +9439,32 @@ function updateHUD(dt){
   // 10. 2D Radar Minimap (Throttled to every 4 frames = ~15Hz, eliminates 75% 2D canvas draw overhead)
   if(hudFrameCount % 4 === 0){
     drawMinimap();
+  }
+
+  // 11. Online PVP Match Status Panel (Throttled to every 10 frames = ~6Hz)
+  if(hudFrameCount % 10 === 0){
+    const mpStatusPanel = document.getElementById('mpMatchStatusPanel');
+    const mpRoomCodeEl = document.getElementById('mpRoomCodeDisplay');
+    const mpPlayerListEl = document.getElementById('mpPlayerListDisplay');
+    if(mpStatusPanel){
+      if(currentRoomId){
+        mpStatusPanel.style.display = 'block';
+        if(mpRoomCodeEl) mpRoomCodeEl.textContent = currentRoomId;
+        if(mpPlayerListEl){
+          let pHtml = `<div style="color:#00e5ff;">🟢 [YOU] ${player ? player.name : 'You'} (${player ? Math.round(player.hp) : 100} HP)</div>`;
+          for(const id in remoteKarts){
+            const rk = remoteKarts[id];
+            if(rk){
+              const col = rk.alive ? '#ffffff' : '#ff1744';
+              pHtml += `<div style="color:${col};">🔵 [PLAYER] ${rk.name} (${rk.alive ? Math.round(rk.hp) + ' HP' : 'RESPAWNING'})</div>`;
+            }
+          }
+          mpPlayerListEl.innerHTML = pHtml;
+        }
+      } else {
+        mpStatusPanel.style.display = 'none';
+      }
+    }
   }
 }
 
@@ -9210,9 +9652,12 @@ function syncMultiplayerPowerups(serverPowerups) {
 /* ---------------- GAME LOOP & RENDERER ---------------- */
 const clock = new THREE.Clock();
 let started = false;
+let menuCamAngle = 0;
 
 function initSoloGame() {
+  const botCount = arguments[0];
   currentRoomId = null;
+  window.currentRoomId = null;
   roundElapsed = 0;
   stormR = ARENA_RADIUS;
   gameOver = false;
@@ -9226,13 +9671,22 @@ function initSoloGame() {
   karts.length = 0;
   const equippedCharId = (typeof CharacterRegistry !== 'undefined' && CharacterRegistry.getSelectedCharacterId) ? CharacterRegistry.getSelectedCharacterId() : 'racer';
   player = new Kart('YOU', selectedKartClass, true, {x:0, z:28}, equippedCharId);
+  player.yaw = Math.PI; // Inward facing towards arena center (0,0)
+  player.updateMeshTransform();
+  if (typeof player.setNameplate === 'function') player.setNameplate('[YOU]', true);
   karts.push(player);
+  window.player = player;
+
+  const count = (typeof botCount === 'number') ? botCount : (typeof selectedSoloBotCount === 'number' ? selectedSoloBotCount : 5);
+  const numBots = Math.max(0, Math.min(7, count));
 
   for(let i=0; i<7; i++){
-    const ang = (i/7)*Math.PI*2 + Math.PI/4;
-    const prof = BOT_PROFILES[i];
+    if (i >= numBots) break;
+    const ang = (i / Math.max(1, numBots)) * Math.PI * 2 + Math.PI / 4;
+    const prof = BOT_PROFILES[i % BOT_PROFILES.length];
     const bot = new Kart(prof.name, prof.classKey, false, {x:Math.cos(ang)*45, z:Math.sin(ang)*45});
     bot.personality = prof.personality;
+    if (typeof bot.setNameplate === 'function') bot.setNameplate(`[${prof.name}]`, false);
     karts.push(bot);
   }
 
@@ -9517,17 +9971,31 @@ function animate() {
       });
     }
 
-    // Particle Trails & Driver Avatar Animation
+    // Particle Trails, Driver Avatar & Dynamic Thrusters/Underglow Animation
     if (typeof karts !== 'undefined' && Array.isArray(karts)) {
       const nowSec = performance.now() * 0.001;
       karts.forEach(k => {
         if (k && k.alive && (k.nitroT > 0 || k.trail === 'flame')) {
           if (typeof spawnNitroFlame === 'function') spawnNitroFlame(k);
         }
-        if (k && k.mesh && k.mesh.userData && k.mesh.userData.driverAvatar) {
-          const avatar = k.mesh.userData.driverAvatar;
-          if (avatar && avatar.userData && typeof avatar.userData.updateAnimation === 'function') {
-            avatar.userData.updateAnimation(nowSec, dt);
+        if (k && k.mesh && k.mesh.userData) {
+          if (k.mesh.userData.driverAvatar) {
+            const avatar = k.mesh.userData.driverAvatar;
+            if (avatar && avatar.userData && typeof avatar.userData.updateAnimation === 'function') {
+              avatar.userData.updateAnimation(nowSec, dt);
+            }
+          }
+          // Dynamic Boost Thrusters Scale & Underglow Pulse
+          if (k.mesh.userData.thrusters && Array.isArray(k.mesh.userData.thrusters)) {
+            const isBoosting = (k.nitroT > 0 || Math.abs(k.speed) > 2);
+            const tScale = isBoosting ? (k.nitroT > 0 ? 1.8 : 1.1 + Math.random() * 0.25) : 0.6;
+            k.mesh.userData.thrusters.forEach(t => {
+              if (t) t.scale.set(tScale, tScale, tScale);
+            });
+          }
+          if (k.mesh.userData.underglow && k.mesh.userData.underglow.material) {
+            const baseOp = (k.nitroT > 0) ? 1.0 : (Math.abs(k.speed) > 1 ? 0.9 : 0.75);
+            k.mesh.userData.underglow.material.opacity = baseOp + Math.sin(nowSec * 5) * 0.08;
           }
         }
       });
@@ -9574,11 +10042,19 @@ function animate() {
           endRound();
         }
       } else {
-        // Multiplayer client update
-        if (typeof karts !== 'undefined' && Array.isArray(karts)) {
-          karts.forEach(k => {
-            if (k && typeof integrateKart === 'function') integrateKart(k, dt, k.isPlayer);
-          });
+        // Multiplayer client update:
+        // 1. Integrate local player
+        if (typeof player !== 'undefined' && player && typeof integrateKart === 'function') {
+          integrateKart(player, dt, true);
+        }
+        // 2. Directly integrate all remote karts from authoritative remoteKarts registry
+        if (typeof remoteKarts === 'object' && remoteKarts !== null) {
+          for (const id in remoteKarts) {
+            const rk = remoteKarts[id];
+            if (rk && typeof integrateKart === 'function') {
+              integrateKart(rk, dt, false);
+            }
+          }
         }
         if (typeof updateProjectiles === 'function') updateProjectiles(dt);
         if (typeof updateParticles === 'function') updateParticles(dt);
@@ -9625,6 +10101,14 @@ function animate() {
 requestAnimationFrame(animate);
 
 function initMultiplayerGame(matchTime) {
+  if (isMultiplayerActive && currentUIState === UIState.GAME) {
+    if (matchTime !== undefined) {
+      roundElapsed = ROUND_TIME - matchTime;
+    }
+    return;
+  }
+  isMultiplayerActive = true;
+
   if (typeof setUIState === 'function' && currentUIState !== UIState.GAME) {
     setUIState(UIState.GAME);
   }
@@ -9633,6 +10117,54 @@ function initMultiplayerGame(matchTime) {
   for (let k in keys) keys[k] = false;
   for (let t in touch) touch[t] = false;
   spacePressed = false;
+
+  // 1. ISOLATE ONLINE PVP: Purge all single-player AI bots & stale entities from scene & karts array
+  karts.forEach(k => {
+    if (k && k !== player) {
+      if (k.mesh) scene.remove(k.mesh);
+    }
+  });
+  for (const id in remoteKarts) {
+    if (remoteKarts[id] && remoteKarts[id].mesh) {
+      scene.remove(remoteKarts[id].mesh);
+    }
+    delete remoteKarts[id];
+  }
+  karts.length = 0;
+
+  // 2. Local player initialization & [YOU] floating nameplate
+  if (player) {
+    karts.push(player);
+    player.alive = true;
+    player.speed = 0;
+    player.hp = player.maxHp = 100;
+    player.weapon = 'pea';
+    player.ammo = Infinity;
+    player.heldPowerup = null;
+    player.name = (typeof getPlayerName === 'function' ? getPlayerName() : 'YOU');
+    if (typeof player.setNameplate === 'function') {
+      player.setNameplate('[YOU]', true);
+    }
+    player.updateMeshTransform();
+  }
+
+  // 3. Camera lock onto local player entity
+  if (player && typeof camera !== 'undefined' && camera) {
+    VEC_SCRATCH_1.set(Math.sin(player.yaw), 0, Math.cos(player.yaw));
+    VEC_SCRATCH_2.copy(player.pos).addScaledVector(VEC_SCRATCH_1, -9.0);
+    VEC_SCRATCH_2.y += 5.2;
+    camera.position.copy(VEC_SCRATCH_2);
+
+    VEC_SCRATCH_3.copy(player.pos);
+    VEC_SCRATCH_3.y += 1.2;
+    if (typeof camTarget !== 'undefined' && camTarget) {
+      camTarget.copy(VEC_SCRATCH_3);
+    }
+    camera.lookAt(camTarget || VEC_SCRATCH_3);
+  }
+  if (typeof SpectatorDirector !== 'undefined' && SpectatorDirector) {
+    SpectatorDirector.activeMode = 0;
+  }
 
   const mTime = (matchTime !== undefined) ? matchTime : 120;
   roundElapsed = ROUND_TIME - mTime;
@@ -9645,17 +10177,6 @@ function initMultiplayerGame(matchTime) {
   if (deathScreen) deathScreen.style.display = 'none';
   if (overlay) overlay.style.display = 'none';
   if (countdownOverlay) countdownOverlay.style.display = 'none';
-
-  if (player) {
-    player.updateMeshTransform();
-  }
-
-  if (player && typeof camTarget !== 'undefined' && camTarget) {
-    VEC_SCRATCH_3.copy(player.pos);
-    VEC_SCRATCH_3.y += 1.2;
-    camTarget.copy(VEC_SCRATCH_3);
-    camera.lookAt(camTarget);
-  }
 
   clock.getDelta();
 }
@@ -10611,6 +11132,11 @@ document.querySelectorAll('button, .menu-btn, .toggle-btn, .kart-select-card').f
     SoundFX.init();
   }, { once: false, passive: true });
 });
+
+// Initialize Bot Count Selector on Load
+if (typeof selectBotCount === 'function') {
+  selectBotCount(selectedSoloBotCount);
+}
 
 // Initialize Main Menu State on Load
 setUIState(UIState.MAIN_MENU);

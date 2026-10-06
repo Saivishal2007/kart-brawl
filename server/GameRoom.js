@@ -1,6 +1,6 @@
 const SPAWN_POSITIONS = [
-  { x: 0, z: 28, yaw: 0 },
-  { x: 0, z: -28, yaw: Math.PI },
+  { x: 0, z: 28, yaw: Math.PI },
+  { x: 0, z: -28, yaw: 0 },
   { x: 28, z: 0, yaw: -Math.PI / 2 },
   { x: -28, z: 0, yaw: Math.PI / 2 },
   { x: 20, z: 20, yaw: -Math.PI * 3 / 4 },
@@ -282,8 +282,8 @@ class GameRoom {
       p.heldPowerup.ammo = p.ammo;
     }
 
-    const fwdX = -Math.sin(p.yaw);
-    const fwdZ = -Math.cos(p.yaw);
+    const fwdX = Math.sin(p.yaw);
+    const fwdZ = Math.cos(p.yaw);
     const spawnX = p.x + fwdX * 1.6;
     const spawnZ = p.z + fwdZ * 1.6;
 
@@ -455,7 +455,8 @@ class GameRoom {
         y: p.y,
         z: p.z,
         yaw: p.yaw,
-        speed: p.speed
+        speed: p.speed,
+        nitroActive: !!p.nitroActive
       }))
     };
   }
@@ -786,22 +787,30 @@ class GameRoom {
 
         const topSpeed = p.nitroActive ? 45.0 : 32.0;
         const accel = 28.0;
+        const brakeDecel = 65.0;
         const turnSpeed = 2.8;
 
         if (inp.forward) {
-          p.speed = Math.min(p.speed + accel * DT, topSpeed);
+          if (p.speed < 0) {
+            p.speed = Math.min(0, p.speed + brakeDecel * DT);
+          } else {
+            p.speed = Math.min(p.speed + accel * DT, topSpeed);
+          }
         } else if (inp.backward) {
-          p.speed = Math.max(p.speed - accel * DT, -12.0);
+          if (p.speed > 0) {
+            p.speed = Math.max(0, p.speed - brakeDecel * DT);
+          } else {
+            p.speed = Math.max(p.speed - accel * DT, -12.0);
+          }
         } else {
           p.speed *= Math.pow(0.85, DT * 30);
         }
 
-        const turnMult = p.speed < 0 ? -1 : 1;
-        if (inp.left) p.yaw += turnSpeed * DT * turnMult;
-        if (inp.right) p.yaw -= turnSpeed * DT * turnMult;
+        if (inp.left) p.yaw -= turnSpeed * DT;
+        if (inp.right) p.yaw += turnSpeed * DT;
 
-        const fwdX = -Math.sin(p.yaw);
-        const fwdZ = -Math.cos(p.yaw);
+        const fwdX = Math.sin(p.yaw);
+        const fwdZ = Math.cos(p.yaw);
 
         // Anti-tunneling substeps
         const substeps = (Math.abs(p.speed) > 16 || p.nitroActive) ? 2 : 1;
