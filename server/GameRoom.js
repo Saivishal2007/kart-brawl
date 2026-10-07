@@ -806,8 +806,8 @@ class GameRoom {
           p.speed *= Math.pow(0.85, DT * 30);
         }
 
-        if (inp.left) p.yaw -= turnSpeed * DT;
-        if (inp.right) p.yaw += turnSpeed * DT;
+        if (inp.left) p.yaw += turnSpeed * DT;
+        if (inp.right) p.yaw -= turnSpeed * DT;
 
         const fwdX = Math.sin(p.yaw);
         const fwdZ = Math.cos(p.yaw);

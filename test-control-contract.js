@@ -225,37 +225,37 @@ async function runTestSuite() {
     );
   }
 
-  // Test 2.3: At yaw = 0, Left steering rotates heading toward World West (-X)
+  // Test 2.3: Left steering rotates heading counter-clockwise (turns LEFT)
   {
-    let yaw = 0;
+    let yaw = Math.PI; // Facing into arena from spawn
     const turnSpeed = 2.8;
     const dt = 1.0 / 30.0;
 
     for (let t = 0; t < 10; t++) {
-      yaw -= turnSpeed * dt; // turnInput = -1 / inp.left
+      yaw += turnSpeed * dt; // inp.left -> increases yaw (counter-clockwise)
     }
 
     const fwdX = Math.sin(yaw);
-    assert(yaw < 0 && fwdX < 0,
+    assert(yaw > Math.PI && fwdX < 0,
       'Physical Steering: Left input rotates heading toward driver LEFT / World West (-X)',
       `Yaw: ${yaw.toFixed(2)} rad, Heading X: ${fwdX.toFixed(2)} (negative = screen left)`
     );
   }
 
-  // Test 2.4: At yaw = 0, Right steering rotates heading toward World East (+X)
+  // Test 2.4: Right steering rotates heading clockwise (turns RIGHT)
   {
-    let yaw = 0;
+    let yaw = Math.PI; // Facing into arena from spawn
     const turnSpeed = 2.8;
     const dt = 1.0 / 30.0;
 
     for (let t = 0; t < 10; t++) {
-      yaw += turnSpeed * dt; // turnInput = +1 / inp.right
+      yaw -= turnSpeed * dt; // inp.right -> decreases yaw (clockwise)
     }
 
     const fwdX = Math.sin(yaw);
-    assert(yaw > 0 && fwdX > 0,
+    assert(yaw < Math.PI && fwdX > 0,
       'Physical Steering: Right input rotates heading toward driver RIGHT / World East (+X)',
-      `Yaw: +${yaw.toFixed(2)} rad, Heading X: +${fwdX.toFixed(2)} (positive = screen right)`
+      `Yaw: ${yaw.toFixed(2)} rad, Heading X: ${fwdX.toFixed(2)} (positive = screen right)`
     );
   }
 
@@ -437,7 +437,7 @@ async function runTestSuite() {
   await delay(100);
 
   const p1AfterLeft = snapP2.players.find(p => p.id === p1.id);
-  assert(p1AfterLeft.yaw < p1BeforeYaw,
+  assert(p1AfterLeft.yaw > p1BeforeYaw,
     'Live Match: P1 ArrowLeft rotates yaw counter-clockwise (turns left)',
     `Yaw before: ${p1BeforeYaw.toFixed(2)} rad, Yaw after: ${p1AfterLeft.yaw.toFixed(2)} rad`
   );
@@ -454,7 +454,7 @@ async function runTestSuite() {
   await delay(100);
 
   const p1AfterRight = snapP2.players.find(p => p.id === p1.id);
-  assert(p1AfterRight.yaw > p1BeforeRightYaw,
+  assert(p1AfterRight.yaw < p1BeforeRightYaw,
     'Live Match: P1 ArrowRight rotates yaw clockwise (turns right)',
     `Yaw before: ${p1BeforeRightYaw.toFixed(2)} rad, Yaw after: ${p1AfterRight.yaw.toFixed(2)} rad`
   );
